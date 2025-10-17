@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gaminute - I'm gaming it!</title>
+<meta name="description" content="Gaminute is a small indie studio making quick, replayable Android games. Explore Galaxiko, Loading Rush, and TicTacToe Lava." />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#ff5757;
+  --cyan:#5ce1e6;
+  --bg:#0b0f14;
+  --text:#e7edf4;
+  --text-dim:#a6b4c2;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Rajdhani",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+a,a:visited,a:hover,a:active{text-decoration:none;outline:none;}
+img{max-width:100%;display:block;}
+.container{max-width:1200px;margin:0 auto;padding:0 40px;}
+section{padding:clamp(60px,8vw,120px) 0;}
+
+/* ===== Header ===== */
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(11,15,20,.85);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+.nav{
+  max-width:1200px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 32px;
+}
+.brand{
+  display:flex;align-items:center;
+  font-family:"Orbitron",sans-serif;font-weight:900;
+  font-size:28px;letter-spacing:1px;
+  color:var(--cyan);
+}
+.brand span{color:var(--red);}
+.brand img{
+  height:36px;width:auto;
+}
+nav ul{list-style:none;display:flex;gap:32px;}
+nav a{color:var(--text);font-weight:600;transition:color .2s;}
+nav a:hover{color:var(--cyan);}
+
+/* ===== Hamburger ===== */
+.menu-toggle{
+  display:none;flex-direction:column;justify-content:center;
+  width:30px;height:24px;gap:5px;cursor:pointer;
+}
+.menu-toggle span{
+  background:var(--text);height:3px;width:100%;
+  border-radius:2px;transition:all .3s;
+}
+.menu-toggle.active span:nth-child(1){transform:rotate(45deg) translateY(8px);}
+.menu-toggle.active span:nth-child(2){opacity:0;}
+.menu-toggle.active span:nth-child(3){transform:rotate(-45deg) translateY(-8px);}
+nav ul.mobile{
+  display:none;flex-direction:column;background:rgba(11,15,20,0.97);
+  position:absolute;top:70px;right:0;width:100%;text-align:center;
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+nav ul.mobile li{padding:18px 0;}
+nav ul.mobile.show{display:flex;}
+
+/* ===== Hero ===== */
+.hero{
+  min-height:100vh;
+  display:flex;justify-content:center;align-items:center;
+  text-align:center;position:relative;overflow:hidden;
+  background:url("backgroundhero.webp") center/cover no-repeat;
+  padding:0 40px;
+}
+.hero::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(11,15,20,0.5),rgba(11,15,20,0.9) 80%,#0b0f14 100%);
+  z-index:1;
+}
+.hero-inner{position:relative;z-index:2;max-width:900px;margin:auto;}
+h1{
+  font-family:"Orbitron",sans-serif;
+  font-weight:900;
+  font-size:clamp(70px,12vw,160px);
+  letter-spacing:2px;
+  color:var(--cyan);
+  text-shadow:
+    0 0 30px rgba(92,225,230,0.4),
+    0 0 60px rgba(255,87,87,0.35);
+}
+h1 .red{
+  color:var(--red);
+  text-shadow:
+    0 0 30px rgba(255,87,87,0.5),
+    0 0 60px rgba(92,225,230,0.3);
+}
+.sub{
+  font-size:clamp(22px,2.4vw,28px);
+  font-weight:600;
+  color:var(--text-dim);
+  margin-top:24px;
+  max-width:700px;
+  margin-inline:auto;
+}
+.actions{
+  display:flex;justify-content:center;gap:24px;
+  flex-wrap:wrap;margin-top:48px;
+}
+.cta,.btn{
+  font-family:"Rajdhani",sans-serif;font-weight:700;font-size:18px;
+  padding:14px 28px;border-radius:50px;letter-spacing:.5px;
+  cursor:pointer;transition:all .25s;
+}
+.cta{background:var(--cyan);color:#000;box-shadow:0 0 20px rgba(92,225,230,.5);}
+.cta:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(92,225,230,.8);}
+.btn{border:1px solid var(--red);color:var(--red);background:transparent;}
+.btn:hover{background:var(--red);color:#fff;box-shadow:0 0 25px rgba(255,87,87,.5);transform:translateY(-2px);}
+
+/* ===== Section Titles ===== */
+section h2{
+  font-family:"Orbitron",sans-serif;
+  font-weight:900;text-align:center;
+  font-size:clamp(36px,5vw,72px);
+  margin-bottom:70px;
+  text-shadow:0 0 25px rgba(92, 225, 230, 0.171);
+}
+#games h2{color:var(--cyan);}
+#about h2{color:var(--red);}
+#faq h2,#contact h2{color:var(--cyan);}
+
+/* ===== Games ===== */
+#games{background:linear-gradient(180deg,#0b0f14,#121a24);}
+.game-block{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:60px;margin-bottom:120px;
+}
+.game-text{
+  flex:1;font-size:20px;color:var(--text-dim);max-width:600px;
+}
+.game-text h3{
+  font-family:"Orbitron",sans-serif;color:var(--red);
+  font-weight:900;font-size:42px;margin-bottom:16px;
+}
+.game-text ul{list-style:disc;margin:14px 0 14px 1.4rem;padding-left:0.6rem;}
+.game-text li{margin:6px 0;}
+.game-image{
+  flex:1;width:100%;max-width:560px;aspect-ratio:3/4;min-height:480px;
+  border-radius:20px;box-shadow:0 0 40px rgba(92,225,230,.1);
+  overflow:hidden;margin-inline:auto;background:rgba(255,255,255,0.02);
+}
+.game-image img{width:100%;height:100%;object-fit:cover;border-radius:18px;}
+.game-block:nth-child(even){flex-direction:row-reverse;}
+
+/* ===== About ===== */
+#about{background:linear-gradient(180deg,#121a24,#0b0f14);}
+.about-inner{max-width:900px;margin:0 auto;text-align:left;font-size:20px;color:var(--text-dim);}
+.about-inner strong{color:var(--cyan);}
+.values{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px;}
+.value{
+  border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:30px;
+  background:rgba(255,255,255,0.04);color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:1px;
+}
+
+/* ===== FAQ ===== */
+#faq{background:#0b0f14;}
+#faq .container{max-width:900px;}
+details{
+  border:1px solid rgba(255,255,255,0.15);border-radius:14px;
+  padding:16px 20px;background:#101720;margin-bottom:14px;
+}
+summary{cursor:pointer;font-weight:700;font-size:20px;}
+details[open]{background:#131c28;}
+.desc{margin-top:10px;color:var(--text-dim);font-size:18px;}
+
+/* ===== Contact ===== */
+#contact{text-align:center;padding:80px 0;background:#0b0f14;}
+#contact .container{max-width:900px;}
+.email-link{
+  display:inline-block;margin-top:10px;font-size:24px;font-weight:700;color:var(--red);
+  text-shadow:0 0 15px rgba(255,87,87,.5);
+}
+.socials{margin-top:26px;display:flex;justify-content:center;gap:28px;}
+.socials img{width:40px;opacity:.85;transition:.2s;filter:drop-shadow(0 0 6px rgba(92,225,230,.5));}
+.socials img:hover{opacity:1;transform:scale(1.08);}
+
+/* ===== Final Slogan ===== */
+#final-slogan{background:var(--bg);text-align:center;padding:120px 20px 100px;}
+#final-slogan h2{
+  font-family:"Orbitron",sans-serif;font-weight:900;
+  font-size:clamp(28px,7vw,56px);color:var(--cyan);white-space:nowrap;
+  text-shadow:0 0 25px rgba(92,225,230,.3),0 0 45px rgba(255,87,87,.3);
+}
+#final-slogan .red{
+  color:var(--red);
+  text-shadow:
+    0 0 25px rgba(255,87,87,.5),
+    0 0 45px rgba(92,225,230,.3);
+}
+
+/* ===== Footer ===== */
+footer{
+  border-top:1px solid rgba(255,255,255,0.1);text-align:center;
+  padding:24px 0 40px;color:var(--text-dim);font-size:15px;
+}
+
+/* ===== Responsive ===== */
+@media(max-width:900px){
+  .container{padding:0 24px;}
+  .nav{padding:12px 24px;}
+  nav ul{display:none;}
+  .menu-toggle{display:flex;}
+  .hero{padding:0 20px;}
+  .game-block{
+    flex-direction:column !important;
+    align-items:center;
+    gap:28px;
+    margin-bottom:90px;
+  }
+  .game-block:nth-child(even){
+    flex-direction:column !important;
+  }
+  .game-text{font-size:20px;text-align:left;max-width:640px;}
+  .game-image{max-width:380px;min-height:auto;}
+  h1{font-size:clamp(64px,14vw,110px);}
+  .actions{gap:16px;}
+  section h2 {
+    font-size: clamp(40px, 8vw, 60px);
+  }
+  .game-text h3 {
+    font-size: 25px;
+  }
+  #final-slogan h2{font-size:clamp(22px,6vw,40px);}
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a class="brand" href="#top">
+      <img src="gaminute_logo.webp" alt="Gaminute logo">
+      <span class="red">Ga</span>minute
+    </a>
+    <nav>
+      <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
+      <ul id="nav-menu">
+        <li><a href="#games">Games</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <ul id="nav-menu-mobile" class="mobile"></ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <h1><span class="red">Ga</span>minute</h1>
+    <p class="sub">Small mobile games for quick breaks.<br>Easy to start, fun to master.</p>
+    <div class="actions">
+      <a href="#games" class="cta">Explore Games</a>
+      <a href="#about" class="btn">About Gaminute</a>
+    </div>
+  </div>
+</section>
+
+<section id="games">
+  <div class="container">
+    <h2>Games</h2>
+
+    <div class="game-block">
+      <div class="game-text">
+        <h3>Galaxiko</h3>
+        <p><strong>Hook:</strong> Hold and release to match the star — simple to try, satisfying to master.</p>
+        <p>Grow your star and release at the perfect size. Levels add pulse, rotation, movement, and multi-star patterns.</p>
+        <ul>
+          <li>Three modes: Challenge, Arcade, Survival</li>
+          <li>Clean one-hand control with instant feedback (MATCH %)</li>
+          <li>Bonus Gold Star for points, time, or ×2 score</li>
+        </ul>
+        <p><em>Coming soon for Android</em></p>
+      </div>
+      <div class="game-image">
+        <img src="galaxikowebimg.webp" alt="Galaxiko promo art" width="1024" height="1024" loading="lazy">
+      </div>
+    </div>
+
+    <div class="game-block">
+      <div class="game-text">
+        <h3>Loading Rush</h3>
+        <p><strong>Hook:</strong> Tap to snap the gap. Simple timing, rising speed.</p>
+        <p>Wait for the gap and tap when the triangle is in the center. The ring speeds up and the gap gets smaller, then widens again every 15 seconds to keep the run fair.</p>
+        <ul>
+          <li>OK / GOOD / PERFECT hits (streaks give ×2 or ×3)</li>
+          <li>Fast restarts and a clear score/record HUD</li>
+          <li>Optional 10 s Slow Motion for the next game (rewarded ad)</li>
+        </ul>
+        <p><em>Coming soon for Android</em></p>
+      </div>
+      <div class="game-image">
+        <img src="loadingwebimg.webp" alt="Loading Rush promo art" width="1024" height="1280" loading="lazy">
+      </div>
+    </div>
+
+    <div class="game-block">
+      <div class="game-text">
+        <h3>TicTacToe Lava</h3>
+        <p><strong>Hook:</strong> The floor is lava. Make five in a row before the board melts.</p>
+        <p>Tap a tile to select, tap again to place your mark. Tiles disappear at random every few turns, changing the board as you play.</p>
+        <ul>
+          <li>11×11 board; make five in a row (row, column, diagonal)</li>
+          <li>Smart bot that blocks and builds lines</li>
+          <li>Bonus Lava Freeze: stop falling tiles for 30 seconds in your next game</li>
+        </ul>
+        <p><em>Coming soon for Android</em></p>
+      </div>
+      <div class="game-image">
+        <img src="lavawebimg.webp" alt="TicTacToe Lava promo art" width="1024" height="1280" loading="lazy">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="about">
+  <div class="container about-inner">
+    <h2>About Gaminute</h2>
+    <p><strong>Gaminute</strong> builds tiny, focused mobile games that respect your time. We believe every tap should feel rewarding and every minute should matter.</p>
+    <p>Our games are crafted with <strong>clarity</strong>, <strong>flow</strong>, and <strong>fair play</strong> in mind — quick to learn, satisfying to master, and built to replay endlessly.</p>
+    <div class="values">
+      <span class="value">Clarity</span>
+      <span class="value">Flow</span>
+      <span class="value">Replayability</span>
+      <span class="value">Fair Play</span>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <h2>FAQ</h2>
+    <details><summary>When will the games be available?</summary><div class="desc">When they are ready. We will share dates on this page.</div></details>
+    <details><summary>Which devices are supported?</summary><div class="desc">Android phones with recent versions. We test on common devices.</div></details>
+    <details><summary>Do the games need internet?</summary><div class="desc">Core play works offline. Some features may use internet.</div></details>
+    <details><summary>Are the games free?</summary><div class="desc">We aim for simple, transparent monetization. Details at launch.</div></details>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <h2>Contact</h2>
+    <a href="mailto:hello@gaminute.com" class="email-link">hello@gaminute.com</a>
+    <div class="socials">
+      <a href="https://youtube.com" target="_blank" aria-label="YouTube">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/youtube.svg" alt="YouTube">
+      </a>
+      <a href="https://instagram.com" target="_blank" aria-label="Instagram">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram">
+      </a>
+      <a href="https://tiktok.com" target="_blank" aria-label="TikTok">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/tiktok.svg" alt="TikTok">
+      </a>
+      <a href="https://twitter.com" target="_blank" aria-label="Twitter / X">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="Twitter / X">
+      </a>
+      <a href="https://facebook.com" target="_blank" aria-label="Facebook">
+        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook">
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="final-slogan">
+  <h2><span class="red">Ga</span>minute - I'm gaming it!</h2>
+</section>
+
+<footer>
+  © <span id="year"></span> Gaminute · All rights reserved.
+</footer>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// Hamburger menu – toggle a automatické zavření po kliknutí
+const toggle = document.getElementById('menu-toggle');
+const desktopMenu = document.getElementById('nav-menu');
+const mobileMenu = document.getElementById('nav-menu-mobile');
+
+// Naklonování desktop položek do mobilního menu
+mobileMenu.innerHTML = desktopMenu.innerHTML;
+
+toggle.addEventListener('click', () => {
+  toggle.classList.toggle('active');
+  mobileMenu.classList.toggle('show');
+});
+
+// Zavření menu po kliknutí na položku
+mobileMenu.addEventListener('click', e => {
+  if (e.target.tagName === 'A') {
+    mobileMenu.classList.remove('show');
+    toggle.classList.remove('active');
+  }
+});
+</script>
+
+</body>
+</html>
