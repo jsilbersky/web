@@ -161,6 +161,38 @@ section h2{
 .game-image img{width:100%;height:100%;object-fit:cover;border-radius:18px;}
 .game-block:nth-child(even){flex-direction:row-reverse;}
 
+/* Teaser grid (safe, no mechanics) */
+.lead{font-size:18px;}
+.teaser-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:28px;
+}
+.teaser-card{
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.03);
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 0 18px rgba(92,225,230,.06);
+}
+.teaser-thumb{
+  aspect-ratio: 3/4;
+  overflow:hidden;border-radius:12px;
+  background:rgba(255,255,255,0.04);
+  margin-bottom:12px;
+}
+.teaser-thumb img{width:100%;height:100%;object-fit:cover;}
+.teaser-card h3{
+  font-family:"Orbitron",sans-serif;
+  font-weight:900;color:var(--cyan);font-size:24px;margin:4px 0 8px;
+}
+.teaser-copy{color:var(--text-dim);font-size:16px;}
+
+@media(max-width:900px){
+  .teaser-grid{grid-template-columns:1fr;gap:18px;}
+}
+
+
 /* ===== About ===== */
 #about{background:linear-gradient(180deg,#121a24,#0b0f14);}
 .about-inner{max-width:900px;margin:0 auto;text-align:left;font-size:20px;color:var(--text-dim);}
@@ -255,7 +287,7 @@ footer{
     <nav>
       <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
       <ul id="nav-menu">
-        <li><a href="#games">Games</a></li>
+        <li><a href="#games">Games <span style="opacity:.6">(soon)</span></a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#contact">Contact</a></li>
@@ -278,61 +310,39 @@ footer{
 
 <section id="games">
   <div class="container">
-    <h2>Games</h2>
+    <h2>Games — coming soon</h2>
+    <p class="lead" style="text-align:center;color:var(--text-dim);max-width:720px;margin:0 auto 40px;">
+      We are preparing a set of small, replayable mobile games. Full details will be announced at launch.
+    </p>
 
-    <div class="game-block">
-      <div class="game-text">
-        <h3>Galaxiko</h3>
-        <p><strong>Hook:</strong> Hold and release to match the star — simple to try, satisfying to master.</p>
-        <p>Grow your star and release at the perfect size. Levels add pulse, rotation, movement, and multi-star patterns.</p>
-        <ul>
-          <li>Three modes: Challenge, Arcade, Survival</li>
-          <li>Clean one-hand control with instant feedback (MATCH %)</li>
-          <li>Bonus Gold Star for points, time, or ×2 score</li>
-        </ul>
-        <p><em>Coming soon for Android</em></p>
-      </div>
-      <div class="game-image">
-        <img src="galaxikowebimg.webp" alt="Galaxiko promo art" width="1024" height="1024" loading="lazy">
-      </div>
+    <div class="teaser-grid">
+      <article class="teaser-card">
+        <div class="teaser-thumb">
+          <img src="galaxikowebimg.webp" alt="Upcoming project teaser" loading="lazy">
+        </div>
+        <h3>Project 1</h3>
+        <p class="teaser-copy">Quick to start, satisfying to improve. Designed for one-hand play and short breaks.</p>
+      </article>
+
+      <article class="teaser-card">
+        <div class="teaser-thumb">
+          <img src="loadingwebimg.webp" alt="Upcoming project teaser" loading="lazy">
+        </div>
+        <h3>Project 2</h3>
+        <p class="teaser-copy">Clear feedback, fast restarts, clean UI. Focused fun without friction.</p>
+      </article>
+
+      <article class="teaser-card">
+        <div class="teaser-thumb">
+          <img src="lavawebimg.webp" alt="Upcoming project teaser" loading="lazy">
+        </div>
+        <h3>Project 3</h3>
+        <p class="teaser-copy">Easy to learn, hard to master. Built for fair challenge and replayability.</p>
+      </article>
     </div>
-
-    <div class="game-block">
-      <div class="game-text">
-        <h3>Loading Rush</h3>
-        <p><strong>Hook:</strong> Tap to snap the gap. Simple timing, rising speed.</p>
-        <p>Wait for the gap and tap when the triangle is in the center. The ring speeds up and the gap gets smaller, then widens again every 15 seconds to keep the run fair.</p>
-        <ul>
-          <li>OK / GOOD / PERFECT hits (streaks give ×2 or ×3)</li>
-          <li>Fast restarts and a clear score/record HUD</li>
-          <li>Optional 10 s Slow Motion for the next game (rewarded ad)</li>
-        </ul>
-        <p><em>Coming soon for Android</em></p>
-      </div>
-      <div class="game-image">
-        <img src="loadingwebimg.webp" alt="Loading Rush promo art" width="1024" height="1280" loading="lazy">
-      </div>
-    </div>
-
-    <div class="game-block">
-      <div class="game-text">
-        <h3>TicTacToe Lava</h3>
-        <p><strong>Hook:</strong> The floor is lava. Make five in a row before the board melts.</p>
-        <p>Tap a tile to select, tap again to place your mark. Tiles disappear at random every few turns, changing the board as you play.</p>
-        <ul>
-          <li>11×11 board; make five in a row (row, column, diagonal)</li>
-          <li>Smart bot that blocks and builds lines</li>
-          <li>Bonus Lava Freeze: stop falling tiles for 30 seconds in your next game</li>
-        </ul>
-        <p><em>Coming soon for Android</em></p>
-      </div>
-      <div class="game-image">
-        <img src="lavawebimg.webp" alt="TicTacToe Lava promo art" width="1024" height="1280" loading="lazy">
-      </div>
-    </div>
-
   </div>
 </section>
+
 
 <section id="about">
   <div class="container about-inner">
