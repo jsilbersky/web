@@ -387,8 +387,17 @@ footer{
 </section>
 
 <footer>
-  © <span id="year"></span> Gaminute · All rights reserved.
+  <div class="container" style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center;text-align:center">
+    <span>© <span id="year"></span> Gaminute · All rights reserved.</span>
+    <span style="opacity:.35">•</span>
+    <a href="/privacy.html" style="color:var(--text-dim)">Privacy</a>
+    <span style="opacity:.35">•</span>
+    <a href="/terms.html" style="color:var(--text-dim)">Terms</a>
+    <span style="opacity:.35">•</span>
+    <a href="mailto:support@gaminute.com" style="color:var(--text-dim)">Contact</a>
+  </div>
 </footer>
+
 
 <script>
 document.getElementById("year").textContent = new Date().getFullYear();
@@ -413,6 +422,34 @@ mobileMenu.addEventListener('click', e => {
     toggle.classList.remove('active');
   }
 });
+</script>
+<style>
+#cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#111722;color:#e7edf4;
+border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;display:none}
+#cookie-banner p{margin:0 0 10px 0;color:#a6b4c2}
+#cookie-banner .row{display:flex;gap:10px;flex-wrap:wrap}
+#cookie-accept,#cookie-decline{border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
+#cookie-accept{background:#00c853;color:#08150a;font-weight:700}
+#cookie-decline{background:#2a2f3a;color:#e7edf4}
+@media(min-width:720px){#cookie-banner{left:auto;right:20px;max-width:520px}}
+</style>
+<div id="cookie-banner" role="dialog" aria-live="polite">
+  <p>We use only necessary cookies for security/performance. No analytics or tracking. See <a href="/privacy.html" style="color:#5ce1e6">Privacy</a>.</p>
+  <div class="row">
+    <button id="cookie-accept">OK</button>
+    <button id="cookie-decline">No, thanks</button>
+  </div>
+</div>
+<script>
+(function(){
+  const KEY='gaminute-cookie-consent';
+  const saved=localStorage.getItem(KEY);
+  const el=document.getElementById('cookie-banner');
+  if(!saved) el.style.display='block';
+  const close=v=>{localStorage.setItem(KEY,v); el.style.display='none';};
+  document.getElementById('cookie-accept').onclick=()=>close('accepted');
+  document.getElementById('cookie-decline').onclick=()=>close('declined');
+})();
 </script>
 
 </body>
