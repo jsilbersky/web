@@ -4,8 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Gaminute - I'm gaming it!</title>
-<meta name="description" content="Gaminute is a small indie studio making quick, replayable Android games. Explore Galaxiko, Loading Rush, and TicTacToe Lava." />
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+<meta name="description" content="Gaminute is a solo Android mobile game lab making tiny, replayable arcade games. Read the public developer diary and try early playtest builds." />
+<!-- Favicon -->
+<link rel="icon" href="gaminute_logo.webp" type="image/webp" sizes="32x32">
+<link rel="shortcut icon" href="gaminute_logo.webp" type="image/webp">
+<link rel="icon" href="gaminute_logo.webp" type="image/webp" sizes="192x192">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --red:#ff5757;
@@ -47,22 +52,14 @@ header{
   color:var(--cyan);
 }
 .brand span{color:var(--red);}
-.brand img{
-  height:36px;width:auto;
-}
+.brand img{height:36px;width:auto;}
 nav ul{list-style:none;display:flex;gap:32px;}
 nav a{color:var(--text);font-weight:600;transition:color .2s;}
 nav a:hover{color:var(--cyan);}
 
 /* ===== Hamburger ===== */
-.menu-toggle{
-  display:none;flex-direction:column;justify-content:center;
-  width:30px;height:24px;gap:5px;cursor:pointer;
-}
-.menu-toggle span{
-  background:var(--text);height:3px;width:100%;
-  border-radius:2px;transition:all .3s;
-}
+.menu-toggle{display:none;flex-direction:column;justify-content:center;width:30px;height:24px;gap:5px;cursor:pointer;}
+.menu-toggle span{background:var(--text);height:3px;width:100%;border-radius:2px;transition:all .3s;}
 .menu-toggle.active span:nth-child(1){transform:rotate(45deg) translateY(8px);}
 .menu-toggle.active span:nth-child(2){opacity:0;}
 .menu-toggle.active span:nth-child(3){transform:rotate(-45deg) translateY(-8px);}
@@ -94,156 +91,332 @@ h1{
   font-size:clamp(70px,12vw,160px);
   letter-spacing:2px;
   color:var(--cyan);
-  text-shadow:
-    0 0 30px rgba(92,225,230,0.4),
-    0 0 60px rgba(255,87,87,0.35);
 }
-h1 .red{
-  color:var(--red);
-  text-shadow:
-    0 0 30px rgba(255,87,87,0.5),
-    0 0 60px rgba(92,225,230,0.3);
-}
+h1 .red{color:var(--red);}
 .sub{
   font-size:clamp(22px,2.4vw,28px);
-  font-weight:600;
-  color:var(--text-dim);
-  margin-top:24px;
-  max-width:700px;
-  margin-inline:auto;
+  font-weight:600;color:var(--text-dim);
+  margin-top:24px;max-width:700px;margin-inline:auto;
 }
-.actions{
-  display:flex;justify-content:center;gap:24px;
-  flex-wrap:wrap;margin-top:48px;
-}
+.actions{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:48px;}
 .cta,.btn{
   font-family:"Rajdhani",sans-serif;font-weight:700;font-size:18px;
-  padding:14px 28px;border-radius:50px;letter-spacing:.5px;
-  cursor:pointer;transition:all .25s;
+  padding:14px 28px;border-radius:50px;letter-spacing:.5px;cursor:pointer;transition:all .25s;
 }
 .cta{background:var(--cyan);color:#000;box-shadow:0 0 20px rgba(92,225,230,.5);}
 .cta:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(92,225,230,.8);}
 .btn{border:1px solid var(--red);color:var(--red);background:transparent;}
 .btn:hover{background:var(--red);color:#fff;box-shadow:0 0 25px rgba(255,87,87,.5);transform:translateY(-2px);}
 
+/* stejné rozměry a vzhled pro všechna .cta a .btn na webu */
+.cta, .btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+  --btn-h:60px;
+  height:var(--btn-h);
+  min-width:220px;
+  padding:0 26px;
+  border-radius:999px;
+  vertical-align:middle;
+}
+
+/* dvouřádková varianta (label + sub) */
+.btn--stack{
+  flex-direction:column;
+  gap:4px;
+  line-height:1.05;
+}
+.btn--stack .btn-label{ font-size:18px; }
+.btn--stack .btn-sub{ font-size:12px; font-weight:700; color:#061015; }
+/* subline bude na hover bíle všude */
+.btn--stack:hover .btn-sub{ color:#fff; }
+
+/* mobilní úpravy */
+@media (max-width:640px){
+  .cta, .btn{
+    --btn-h:54px;
+    min-width:min(46vw, 240px);
+    padding:0 20px;
+  }
+}
+
+/* Patreon: plná červená varianta se stejnými rozměry jako ostatní */
+.btn--patreon{
+  background: var(--red);
+  color: #fff;
+  border: none;
+  box-shadow: 0 0 20px rgba(255,87,87,.35);
+}
+
+/* podtitul může zůstat šedší; pokud chceš světlejší, odkomentuj další řádek */
+/* .btn--patreon .btn-sub { color: rgba(255,255,255,.9); } */
+
+/* Hover: žádná změna barvy, jen „lift + silnější stín“ */
+.btn--patreon:hover{
+  background: var(--red);   /* přepíše default .btn:hover */
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(255,87,87,.6);
+}
+
+
+/* (volitelné) zachovej zarovnání obsahu v .actions řádku */
+.actions{ align-items:center; }
+
+
 /* ===== Section Titles ===== */
 section h2{
-  font-family:"Orbitron",sans-serif;
-  font-weight:900;text-align:center;
-  font-size:clamp(36px,5vw,72px);
-  margin-bottom:70px;
-  text-shadow:0 0 25px rgba(92, 225, 230, 0.171);
+  font-family:"Orbitron",sans-serif;font-weight:900;text-align:center;
+  font-size:clamp(36px,5vw,72px);margin-bottom:30px;
 }
-#games h2{color:var(--cyan);}
-#about h2{color:var(--red);}
+#games h2{color:var(--cyan);} #about h2{color:var(--red);}
 #faq h2,#contact h2{color:var(--cyan);}
 
 /* ===== Games ===== */
 #games{background:linear-gradient(180deg,#0b0f14,#121a24);}
-.game-block{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:60px;margin-bottom:120px;
-}
-.game-text{
-  flex:1;font-size:20px;color:var(--text-dim);max-width:600px;
-}
-.game-text h3{
-  font-family:"Orbitron",sans-serif;color:var(--red);
-  font-weight:900;font-size:42px;margin-bottom:16px;
-}
+.game-block{display:flex;align-items:center;justify-content:space-between;gap:60px;margin-bottom:120px;}
+.game-text{flex:1;font-size:20px;color:var(--text-dim);max-width:600px;}
+.game-text h3{font-family:"Orbitron",sans-serif;color:var(--red);font-weight:900;font-size:42px;margin-bottom:16px;}
 .game-text ul{list-style:disc;margin:14px 0 14px 1.4rem;padding-left:0.6rem;}
 .game-text li{margin:6px 0;}
-.game-image{
-  flex:1;width:100%;max-width:560px;aspect-ratio:3/4;min-height:480px;
-  border-radius:20px;box-shadow:0 0 40px rgba(92,225,230,.1);
-  overflow:hidden;margin-inline:auto;background:rgba(255,255,255,0.02);
-}
+.game-image{flex:1;width:100%;max-width:560px;aspect-ratio:3/4;min-height:480px;border-radius:20px;box-shadow:0 0 40px rgba(92,225,230,.1);overflow:hidden;margin-inline:auto;background:rgba(255,255,255,0.02);}
 .game-image img{width:100%;height:100%;object-fit:cover;border-radius:18px;}
 .game-block:nth-child(even){flex-direction:row-reverse;}
-
-/* Teaser grid (safe, no mechanics) */
 .lead{font-size:18px;}
-.teaser-grid{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:28px;
-}
-.teaser-card{
-  border:1px solid rgba(255,255,255,0.08);
-  background:rgba(255,255,255,0.03);
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 0 18px rgba(92,225,230,.06);
-}
-.teaser-thumb{
-  aspect-ratio: 3/4;
-  overflow:hidden;border-radius:12px;
-  background:rgba(255,255,255,0.04);
-  margin-bottom:12px;
-}
+.teaser-grid{display:grid;grid-template-columns: repeat(3, 1fr);gap:28px;}
+.teaser-card{border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);border-radius:16px;padding:16px;box-shadow:0 0 18px rgba(92,225,230,.06);}
+.teaser-thumb{aspect-ratio: 3/4;overflow:hidden;border-radius:12px;background:rgba(255,255,255,0.04);margin-bottom:12px;}
 .teaser-thumb img{width:100%;height:100%;object-fit:cover;}
-.teaser-card h3{
-  font-family:"Orbitron",sans-serif;
-  font-weight:900;color:var(--cyan);font-size:24px;margin:4px 0 8px;
-}
+.teaser-card h3{font-family:"Orbitron",sans-serif;font-weight:900;color:var(--cyan);font-size:24px;margin:4px 0 8px;}
 .teaser-copy{color:var(--text-dim);font-size:16px;}
+@media(max-width:900px){.teaser-grid{grid-template-columns:1fr;gap:18px;}}
 
-@media(max-width:900px){
-  .teaser-grid{grid-template-columns:1fr;gap:18px;}
+/* ===== About (clean) ===== */
+#about { 
+  background: linear-gradient(180deg,#121a24,#0b0f14);
+}
+
+.about-grid{
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 32px;
+  align-items: start;             /* rovnou správně k topu */
+}
+
+.about-photo{
+  aspect-ratio: 1/1;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(92,225,230,.25);
+  box-shadow: 0 0 32px rgba(92,225,230,.09);
+  align-self: start;
+}
+.about-photo img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;                 /* bez mezer kolem obrázku */
+}
+
+/* Hlavní About headline už dědí z section h2, netřeba stylovat zvlášť */
+
+/* Podnadpisy (stejný look jako h3 v kartách „Project 1/2/3“) */
+.about-sub{
+  font-family:"Orbitron",sans-serif;
+  font-weight:900;
+  color: var(--cyan);
+  font-size: 24px;
+  margin: 16px 0 8px;
+}
+
+/* Textové odstavce v About (sjednocené copy proměnné) */
+.about-copy p{
+  font-size: var(--copy-size);
+  font-weight: var(--copy-weight);
+  line-height: 1.65;
+  color: var(--copy-color);
+  margin: 0;                     /* bez výchozích okrajů */
+}
+
+/* Úvodní odstavec – výraznější */
+.about-lead{
+  font-size: clamp(20px,2vw,22px);
+  font-weight: 800;
+  line-height: 1.6;
+  color: #eaf1f7;
+  margin: 0;
+}
+
+/* CTA pod textem */
+.about-cta-center{ 
+  margin-top: 12px; 
+}
+
+/* Responsivita */
+@media (max-width:900px){
+  .about-grid{ grid-template-columns: 1fr; }
+  .about-photo{ max-width: 420px; margin: 0 auto; }
 }
 
 
-/* ===== About ===== */
-#about{background:linear-gradient(180deg,#121a24,#0b0f14);}
-.about-inner{max-width:900px;margin:0 auto;text-align:left;font-size:20px;color:var(--text-dim);}
-.about-inner strong{color:var(--cyan);}
-.values{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px;}
-.value{
-  border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:30px;
-  background:rgba(255,255,255,0.04);color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:1px;
+
+/* ===== PATREON (simple, clean) ===== */
+#patreon{background:linear-gradient(180deg,#0b0f14,#101722);}
+#patreon .intro{max-width:900px;margin:0 auto;text-align:center;}
+#patreon .intro h2{color:var(--cyan);margin-bottom:10px;}
+#patreon .intro p{color:var(--text-dim);font-size:20px;max-width:720px;margin:0 auto 24px;}
+
+/* podnadpis "What you get" */
+#patreon .p-subtitle{
+  font-family:"Orbitron",sans-serif;
+  color:var(--red);
+  text-align:center;
+  font-size:28px;
+  font-weight:900;
+  margin:8px 0 18px;
 }
 
-/* ===== FAQ ===== */
+/* stylová tabulka 2 sloupce (Free vs Supporter) */
+/* stylová tabulka: Benefit + Free follower + Supporter ($3) */
+.p-table{
+  max-width: 980px;
+  margin: 0 auto 24px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  overflow: hidden;                 /* žádný horizontální posuvník */
+}
+
+.p-table table{
+  width: 100%;
+  border-collapse: collapse;        /* zarovná okraje buněk */
+  table-layout: fixed;              /* drží šířky sloupců, text se zalamuje */
+}
+
+/* šířky sloupců (funguje i bez <colgroup>) */
+.p-table th, .p-table td{
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  white-space: normal;
+  word-break: break-word;
+}
+
+.p-table thead th{
+  font-family: "Orbitron", sans-serif;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: .8px;
+  color: #fff;
+  background: rgba(255,255,255,.04);
+}
+
+.p-table tbody tr:last-child td{ border-bottom: none; }
+
+/* šířky sloupců – kratší Benefit, dva stejné pravé */
+.p-table th:nth-child(1), .p-table td:nth-child(1){ width: 36%; color: var(--text-dim); }
+.p-table th:nth-child(2), .p-table td:nth-child(2){ width: 32%; text-align: center; }
+.p-table th:nth-child(3), .p-table td:nth-child(3){ width: 32%; text-align: center; }
+
+/* zvýraznění Supporter sloupce (bez <colgroup> triků) */
+.p-table th:nth-child(3), .p-table td:nth-child(3){
+  background: rgba(92,225,230,.06);
+}
+
+/* ikony/znaky ano/ne */
+.p-table .yes{ font-weight: 800; }
+.p-table .no{ opacity: .5; }
+
+/* CTA pod tabulkou (využívá existující .btn & .btn--stack z hero) */
+.p-cta-center{ text-align: center; margin-top: 8px; }
+.p-note{ color: var(--text-dim); text-align: center; font-size: 14px; margin-top: 8px; }
+
+/* Mobilní doladění */
+@media (max-width: 600px){
+  .p-table th, .p-table td{ padding: 10px 12px; }
+  .p-table thead th{ font-size: 12px; }
+  /* trochu víc místa Benefitu, ale pořád krátké */
+  .p-table th:nth-child(1), .p-table td:nth-child(1){ width: 38%; }
+  .p-table th:nth-child(2), .p-table td:nth-child(2),
+  .p-table th:nth-child(3), .p-table td:nth-child(3){ width: 31%; }
+}
+
+
+
+/* ===== FAQ / Contact / Footer ===== */
 #faq{background:#0b0f14;}
 #faq .container{max-width:900px;}
-details{
-  border:1px solid rgba(255,255,255,0.15);border-radius:14px;
-  padding:16px 20px;background:#101720;margin-bottom:14px;
-}
+details{border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:16px 20px;background:#101720;margin-bottom:14px;}
 summary{cursor:pointer;font-weight:700;font-size:20px;}
 details[open]{background:#131c28;}
 .desc{margin-top:10px;color:var(--text-dim);font-size:18px;}
-
-/* ===== Contact ===== */
 #contact{text-align:center;padding:80px 0;background:#0b0f14;}
 #contact .container{max-width:900px;}
-.email-link{
-  display:inline-block;margin-top:10px;font-size:24px;font-weight:700;color:var(--red);
-  text-shadow:0 0 15px rgba(255,87,87,.5);
-}
-.socials{margin-top:26px;display:flex;justify-content:center;gap:28px;}
-.socials img{width:40px;opacity:.85;transition:.2s;filter:drop-shadow(0 0 6px rgba(92,225,230,.5));}
-.socials img:hover{opacity:1;transform:scale(1.08);}
+.email-link{display:inline-block;font-size:28px;font-weight:700;color:var(--red);}
+#final-slogan{background:var(--bg);text-align:center;padding:50px 20px 100px;}
+#final-slogan h2{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(28px,7vw,56px);color:var(--cyan);white-space:nowrap;}
+#final-slogan .red{color:var(--red);}
+footer{border-top:1px solid rgba(255,255,255,0.1);text-align:center;padding:24px 0 40px;color:var(--text-dim);font-size:15px;}
+/* CONTACT – compact glass card + details */
+#contact{ background:#0b0f14; }
+#contact h2{ margin-bottom:14px; }
 
-/* ===== Final Slogan ===== */
-#final-slogan{background:var(--bg);text-align:center;padding:120px 20px 100px;}
-#final-slogan h2{
-  font-family:"Orbitron",sans-serif;font-weight:900;
-  font-size:clamp(28px,7vw,56px);color:var(--cyan);white-space:nowrap;
-  text-shadow:0 0 25px rgba(92,225,230,.3),0 0 45px rgba(255,87,87,.3);
+.contact-wrap{
+  display:flex; justify-content:center;
 }
-#final-slogan .red{
+
+.contact-card{
+  width:min(740px, 96%);
+  margin:0 auto;
+  padding:22px 22px 26px;
+  border-radius:18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border:1px solid rgba(92,225,230,.12);
+  box-shadow:
+    0 10px 36px rgba(0,0,0,.35),
+    inset 0 0 0 1px rgba(255,255,255,.02);
+}
+
+.contact-head{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-bottom:8px;
+}
+.contact-icon{
+  width:28px; height:28px; color:var(--cyan);
+  filter: drop-shadow(0 0 8px rgba(92,225,230,.35));
+}
+
+.contact-mail{
+  display:inline-block;
+  font-size:clamp(22px,3vw,30px);
+  font-weight:800;
   color:var(--red);
-  text-shadow:
-    0 0 25px rgba(255,87,87,.5),
-    0 0 45px rgba(92,225,230,.3);
+  letter-spacing:.2px;
 }
 
-/* ===== Footer ===== */
-footer{
-  border-top:1px solid rgba(255,255,255,0.1);text-align:center;
-  padding:24px 0 40px;color:var(--text-dim);font-size:15px;
+/* Contact – text pod e-mailem ve stejném stylu jako body copy */
+.contact-sub{
+  font-size: var(--copy-size);
+  font-weight: var(--copy-weight);
+  line-height: 1.65;
+  color: var(--copy-color);
+  margin: 6px 0 10px;  /* jemný rozestup od divideru */
+  text-align: center;
 }
+
+.contact-divider{
+  height:1px; width:120px; margin:14px auto 12px;
+  background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity:.5; border-radius:2px;
+}
+
+.contact-cta{ margin-top:10px; }
+
+/* malé doladění spacingu celé sekce */
+#contact .container{ max-width:900px; }
+
 
 /* ===== Responsive ===== */
 @media(max-width:900px){
@@ -252,28 +425,72 @@ footer{
   nav ul{display:none;}
   .menu-toggle{display:flex;}
   .hero{padding:0 20px;}
-  .game-block{
-    flex-direction:column !important;
-    align-items:center;
-    gap:28px;
-    margin-bottom:90px;
-  }
-  .game-block:nth-child(even){
-    flex-direction:column !important;
-  }
+  .game-block{flex-direction:column !important;align-items:center;gap:28px;margin-bottom:90px;}
+  .game-block:nth-child(even){flex-direction:column !important;}
   .game-text{font-size:20px;text-align:left;max-width:640px;}
   .game-image{max-width:380px;min-height:auto;}
   h1{font-size:clamp(64px,14vw,110px);}
   .actions{gap:16px;}
-  section h2 {
-    font-size: clamp(40px, 8vw, 60px);
-  }
-  .game-text h3 {
-    font-size: 25px;
-  }
+  section h2{font-size:clamp(40px, 8vw, 60px);}
+  .game-text h3{font-size:25px;}
   #final-slogan h2{font-size:clamp(22px,6vw,40px);}
+  .pane .cards{grid-template-columns:1fr;}
+  .help{grid-template-columns:repeat(2,1fr);}
 }
 
+/* ===== Unified body copy for key sections ===== */
+:root{
+  /* jednotná velikost + barva pro kopírovací text napříč sekcemi */
+  --copy-size: clamp(18px, 1.9vw, 20px);
+  --copy-weight: 600;              /* trochu tučnější pro čitelnost */
+  --copy-color: #dfe7ee;           /* světlejší než --text-dim */
+}
+
+/* Games – lead odstavec + texty na kartách (vč. "Project 1/2/3") */
+#games .lead,
+.teaser-card .teaser-copy{
+  font-size: var(--copy-size);
+  font-weight: var(--copy-weight);
+  line-height: 1.6;
+  color: var(--copy-color);
+}
+
+/* About – všechny odstavce */
+#about .about-inner p{
+  font-size: var(--copy-size);
+  font-weight: var(--copy-weight);
+  line-height: 1.65;
+  color: var(--copy-color);
+}
+
+/* Patreon – úvodní odstavec pod nadpisem */
+#patreon .intro p{
+  font-size: var(--copy-size);
+  font-weight: var(--copy-weight);
+  line-height: 1.65;
+  color: var(--copy-color);
+}
+
+/* FAQ – obsah po rozkliknutí */
+#faq .desc{
+  font-size: var(--copy-size);
+  font-weight: var(--copy-weight);
+  line-height: 1.65;
+  color: var(--copy-color);
+}
+
+/* Grid v About — zarovnat oba sloupce k hornímu okraji */
+.about-grid{ align-items: start; }
+
+/* Pro jistotu i samotný blok s fotkou přiraz k topu */
+.about-photo{ align-self: start; margin-top: 0; }
+
+/* Uvnitř figure žádný dodatečný offset */
+.about-photo img{ display:block; vertical-align: top; }
+
+
+
+@media(max-width:520px){.help{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -287,8 +504,9 @@ footer{
     <nav>
       <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
       <ul id="nav-menu">
-        <li><a href="#games">Games <span style="opacity:.6">(soon)</span></a></li>
+        <li><a href="#games">Games</a></li>
         <li><a href="#about">About</a></li>
+        <li><a href="#patreon">Patreon</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
@@ -300,10 +518,15 @@ footer{
 <section class="hero" id="top">
   <div class="hero-inner">
     <h1><span class="red">Ga</span>minute</h1>
-    <p class="sub">Small mobile games for quick breaks.<br>Easy to start, fun to master.</p>
+    <p class="sub">Solo creator Android game lab for tiny arcades. <br>Backstage is on Patreon: wins, mistakes, fixes.</p>
+
     <div class="actions">
       <a href="#games" class="cta">Explore Games</a>
-      <a href="#about" class="btn">About Gaminute</a>
+<a href="PATREON_URL?utm_source=site&utm_medium=hero&utm_campaign=cta_button"
+   class="btn btn--stack btn--patreon">
+  <span class="btn-label">Follow on Patreon</span>
+</a>
+
     </div>
   </div>
 </section>
@@ -311,31 +534,19 @@ footer{
 <section id="games">
   <div class="container">
     <h2>Games — coming soon</h2>
-    <p class="lead" style="text-align:center;color:var(--text-dim);max-width:720px;margin:0 auto 40px;">
-      We are preparing a set of small, replayable mobile games. Full details will be announced at launch.
-    </p>
-
     <div class="teaser-grid">
       <article class="teaser-card">
-        <div class="teaser-thumb">
-          <img src="galaxikowebimg.webp" alt="Upcoming project teaser" loading="lazy">
-        </div>
+        <div class="teaser-thumb"><img src="galaxikowebimg.webp" alt="Upcoming project teaser" loading="lazy"></div>
         <h3>Project 1</h3>
         <p class="teaser-copy">Quick to start, satisfying to improve. Designed for one-hand play and short breaks.</p>
       </article>
-
       <article class="teaser-card">
-        <div class="teaser-thumb">
-          <img src="loadingwebimg.webp" alt="Upcoming project teaser" loading="lazy">
-        </div>
+        <div class="teaser-thumb"><img src="loadingwebimg.webp" alt="Upcoming project teaser" loading="lazy"></div>
         <h3>Project 2</h3>
         <p class="teaser-copy">Clear feedback, fast restarts, clean UI. Focused fun without friction.</p>
       </article>
-
       <article class="teaser-card">
-        <div class="teaser-thumb">
-          <img src="lavawebimg.webp" alt="Upcoming project teaser" loading="lazy">
-        </div>
+        <div class="teaser-thumb"><img src="lavawebimg.webp" alt="Upcoming project teaser" loading="lazy"></div>
         <h3>Project 3</h3>
         <p class="teaser-copy">Easy to learn, hard to master. Built for fair challenge and replayability.</p>
       </article>
@@ -343,57 +554,245 @@ footer{
   </div>
 </section>
 
-
 <section id="about">
-  <div class="container about-inner">
-    <h2>About Gaminute</h2>
-    <p><strong>Gaminute</strong> builds tiny, focused mobile games that respect your time. We believe every tap should feel rewarding and every minute should matter.</p>
-    <p>Our games are crafted with <strong>clarity</strong>, <strong>flow</strong>, and <strong>fair play</strong> in mind — quick to learn, satisfying to master, and built to replay endlessly.</p>
-    <div class="values">
-      <span class="value">Clarity</span>
-      <span class="value">Flow</span>
-      <span class="value">Replayability</span>
-      <span class="value">Fair Play</span>
+  <div class="container">
+    <!-- Hlavní nadpis stejné úrovně jako Games/Patreon/Contact -->
+    <h2>About Creator</h2>
+
+    <div class="about-grid">
+      <!-- FOTO vlevo (desktop) / nahoře (mobil) -->
+      <figure class="about-photo">
+        <img src="Jiri.webp" alt="Jiri — Gaminute">
+      </figure>
+
+      <!-- TEXT -->
+      <div class="about-copy">
+        <!-- 1) Úvodní odstavec -->
+        <p class="about-lead">
+          Hello, I’m Jiri, a software tester from the Czech Republic. I tried building simple apps,
+          but tiny mobile games grabbed me completely - one clean mechanic, tight timing,
+          and that “one more try” loop you can finish in seconds.
+        </p>
+
+        <!-- 2) Filozofie (stejný level, jako Project 1/2/3 v Games) -->
+        <h3 class="about-sub">Gaminute philosophy</h3>
+        <p>
+          My goal is clarity, quick retries, and fair challenge. I’m not a pro game developer;
+          I’m learning in public and building Gaminute in my free time.
+          Android only for now. I use rewarded ads only - no banners, no forced videos, no pop-ups.
+          After a run, you can watch a short ad for a small bonus. If you skip it, you keep playing.
+          The game flow stays clean.
+        </p>
+
+        <!-- 3) Patreon (stejný level jako Project 1/2/3 v Games) -->
+        <h3 class="about-sub">Patreon dev diary</h3>
+        <p>
+          I keep a personal dev diary on Patreon — part build notes, part behind-the-scenes journal.
+          I share wins and mistakes, design decisions, backups, and why things change.
+          It’s not just features; it’s the whole Gaminute journey.
+        </p>
+
+        <!-- CTA (stejné tlačítko jako v hero) -->
+        <div class="about-cta-center">
+          <a href="PATREON_URL?utm_source=site&utm_medium=about_cta"
+             class="btn btn--stack btn--patreon">
+            <span class="btn-label">Follow on Patreon</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<!-- ==================== PATREON SECTION (simple) ==================== -->
+<section id="patreon">
+  <div class="container">
+    <div class="intro">
+      <h2>Patreon</h2>
+      <p>I’m grateful for everyone who joins. Follow for free to read public notes. Support for $3 to play early and help decide small features. I’m an independent creator building everything myself.</p>
+    </div>
+
+    <h3 class="p-subtitle">What you get</h3>
+
+    <div class="p-table" role="region" aria-label="Patreon benefits">
+      <table>
+        <colgroup>
+          <col>
+          <col>
+          <col class="supporter">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Benefit</th>
+            <th>Free Follower</th>
+            <th>Supporter $3</th>
+          </tr>
+        </thead>
+<tbody>
+  <tr>
+    <td><strong>Dev diary (public posts)</strong></td>
+    <td class="yes">✔</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>Open challenges</strong></td>
+    <td class="yes">✔</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>World record leaderboard</strong></td>
+    <td class="yes">✔</td>
+    <td class="yes">✔</td>
+  </tr>
+
+  <tr>
+    <td><strong>Roadmap &amp; open polls</strong></td>
+    <td class="yes">✔</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>Feature &amp; cosmetic votes</strong></td>
+    <td class="no">–</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>Work-in-progress notes</strong></td>
+    <td class="no">–</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>Bug Hall of Fame</strong></td>
+    <td class="no">–</td>
+    <td class="yes">✔</td>
+  </tr>
+
+  <tr>
+    <td><strong>Early playtest builds</strong></td>
+    <td class="no">–</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>Playtest brief</strong></td>
+    <td class="no">–</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>Supporter League</strong></td>
+    <td class="no">–</td>
+    <td class="yes">✔</td>
+  </tr>
+  <tr>
+    <td><strong>Thank you in credits</strong></td>
+    <td class="no">–</td>
+    <td class="yes">✔</td>
+  </tr>
+</tbody>
+
+      </table>
+    </div>
+
+    <div class="p-cta-center">
+<a href="PATREON_URL?utm_source=site&utm_medium=patreon_table_cta"
+   class="btn btn--stack btn--patreon">
+  <span class="btn-label">Follow on Patreon</span>
+</a>
+
+      <div class="p-note">Cancel anytime. No tiers to decode.</div>
+    </div>
+  </div>
+</section>
+<!-- ================== /PATREON SECTION (simple) ================== -->
+
 
 <section id="faq">
   <div class="container">
     <h2>FAQ</h2>
-    <details><summary>When will the games be available?</summary><div class="desc">When they are ready. We will share dates on this page.</div></details>
-    <details><summary>Which devices are supported?</summary><div class="desc">Android phones with recent versions. We test on common devices.</div></details>
-    <details><summary>Do the games need internet?</summary><div class="desc">Core play works offline. Some features may use internet.</div></details>
-    <details><summary>Are the games free?</summary><div class="desc">We aim for simple, transparent monetization. Details at launch.</div></details>
+
+    <details>
+      <summary>Which platforms are supported?</summary>
+      <div class="desc">
+        Android only for now. iOS may come later if there’s enough interest.
+        If you’d like to help me test across more devices, you can follow on Patreon (free) or support with $3.
+        <br><br>
+        <a href="PATREON_URL?utm_source=site&utm_medium=faq_platforms" style="color:var(--cyan);font-weight:700;">Follow on Patreon</a>
+      </div>
+    </details>
+
+        <details>
+      <summary>Why only Patreon (and not other socials)?</summary>
+      <div class="desc">
+        I keep everything in one quiet place so I can spend more time making games and less time juggling feeds.
+        Free followers get public posts and big-update alerts; supporters get early builds, private notes, and priority feedback.
+        <br><br>
+        <a href="PATREON_URL?utm_source=site&utm_medium=faq_why" style="color:var(--cyan);font-weight:700;">Follow on Patreon</a>
+      </div>
+    </details>
+
+    <details>
+      <summary>Are the games free?</summary>
+      <div class="desc">
+        Yes. Monetization is rewarded ads only. No banners, no forced videos, no pop-ups.
+        After a run you can optionally watch a short ad for a small bonus — you can always skip it and keep playing.
+      </div>
+    </details>
+
+    <details>
+      <summary>Do I need internet to play?</summary>
+      <div class="desc">
+        Core gameplay works offline. Internet is only needed for things like updates, optional rewarded ads, or future online features.
+      </div>
+    </details>
+
+    <details>
+      <summary>How can I report a bug or suggest an idea?</summary>
+      <div class="desc">
+        Comment or DM on Patreon, or email <a href="mailto:hello@gaminute.com" style="color:var(--cyan);font-weight:700;">hello@gaminute.com</a>.
+        Please include your device model, Android version, and a short description (a screenshot/video helps).
+      </div>
+    </details>
+
+    <details>
+      <summary>Do you track my data?</summary>
+      <div class="desc">
+        I try to keep things simple and private. I don’t collect personal data about you.
+        <br><br>
+        <strong>Website:</strong> only essential cookies for security/performance. No analytics, no tracking pixels.<br><br>
+        <strong>In-game:</strong> no analytics right now.<br><br>
+        <strong>Ads (rewarded only):</strong> the optional ad you can watch after a run is delivered by third-party ad networks (e.g., Google).
+        Depending on your Google/Android settings, ads may be personalized. I don’t get your personal data — I only see aggregate reports (like views and earnings).
+        You can manage ad personalization in your Google account or Android settings.<br><br>
+        <strong>Store:</strong> installs, purchases, and payments go through Google Play with its own privacy terms.
+        <br>
+      </div>
+    </details>
+
   </div>
 </section>
+
+
 
 <section id="contact">
   <div class="container">
     <h2>Contact</h2>
-    <a href="mailto:hello@gaminute.com" class="email-link">hello@gaminute.com</a>
-    <div class="socials">
-      <a href="https://www.youtube.com/@gaminutestudio" target="_blank" rel="noopener noreferrer" aria-label="YouTube" title="YouTube">
-        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/youtube.svg" alt="YouTube">
-      </a>
-      <a href="https://www.instagram.com/gaminute_studio/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
-        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram">
-      </a>
-      <a href="https://www.tiktok.com/@gaminute_studio" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
-        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/tiktok.svg" alt="TikTok">
-      </a>
-      <a href="https://x.com/gaminute" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" title="X (Twitter)">
-        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="X (Twitter)">
-      </a>
-      <a href="https://www.facebook.com/profile.php?id=61582788972890" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
-        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook">
-      </a>
-      <a href="https://discord.gg/ZkbGEZ3Q" target="_blank" rel="noopener noreferrer" aria-label="Discord" title="Discord">
-        <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/discord.svg" alt="Discord">
-      </a>
+
+    <div class="contact-wrap">
+      <div class="contact-card">
+        <div class="contact-head">
+          <a href="mailto:hello@gaminute.com" class="contact-mail">hello@gaminute.com</a>
+        </div>
+        <div class="contact-divider"></div>
+        <p class="contact-sub">See you on Patreon.</p>
+        <div class="contact-cta">
+          <a href="PATREON_URL?utm_source=site&utm_medium=contact_cta"
+             class="btn btn--stack btn--patreon">
+            <span class="btn-label">Follow on Patreon</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
 
 
 <section id="final-slogan">
@@ -416,27 +815,21 @@ footer{
 <script>
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// Hamburger menu – toggle a automatické zavření po kliknutí
+// Hamburger menu
 const toggle = document.getElementById('menu-toggle');
 const desktopMenu = document.getElementById('nav-menu');
 const mobileMenu = document.getElementById('nav-menu-mobile');
-
-// Naklonování desktop položek do mobilního menu
 mobileMenu.innerHTML = desktopMenu.innerHTML;
+toggle.addEventListener('click', () => {toggle.classList.toggle('active');mobileMenu.classList.toggle('show');});
+mobileMenu.addEventListener('click', e => { if (e.target.tagName === 'A') { mobileMenu.classList.remove('show'); toggle.classList.remove('active'); }});
 
-toggle.addEventListener('click', () => {
-  toggle.classList.toggle('active');
-  mobileMenu.classList.toggle('show');
-});
 
-// Zavření menu po kliknutí na položku
-mobileMenu.addEventListener('click', e => {
-  if (e.target.tagName === 'A') {
-    mobileMenu.classList.remove('show');
-    toggle.classList.remove('active');
-  }
-});
+// Respect reduced motion
+const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+if(mq.matches){ stopScroll(); }
 </script>
+
+<!-- Cookie banner (beze změn) -->
 <style>
 #cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#111722;color:#e7edf4;
 border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;display:none}
@@ -468,4 +861,3 @@ border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;disp
 
 </body>
 </html>
-<!-- redeploy -->
