@@ -56,6 +56,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
 
 <style>
+  
 /* ========= CSS VARIABLES ========= */
 :root{
   /* Brand palette */
@@ -551,11 +552,11 @@ details .desc{margin-top:12px; color:var(--dim); font-size:16px; line-height:1.6
 details .desc a{color:var(--cyan); text-decoration:underline;}
 
 /* ========= FOOTER CTA / FOOTER ========= */
-.footer-cta{
+.join-panel{
   padding-block: clamp(80px, 12vw, 140px);
   background: linear-gradient(180deg, transparent 0%, rgba(0,212,255,.03) 100%);
 }
-.footer-cta .actions{
+.join-panel .actions{
   margin-top:24px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
 }
 
@@ -600,17 +601,17 @@ footer a:hover{color:var(--cyan);}
 }
 
 /* --- Force show Footer CTA (production fallback) --- */
-section.footer-cta {
+section.join-panel {
   display: block !important;
   opacity: 1 !important;
   transform: none !important;
   visibility: visible !important;
   padding: 64px 0 !important;
 }
-section.footer-cta .container {
+section.join-panel .container {
   display: block !important;
 }
-section.footer-cta .actions {
+section.join-panel .actions {
   display: flex !important;
   gap: 16px !important;
   justify-content: center !important;
@@ -1066,7 +1067,7 @@ and everything in between.</p>
 </section>
 
 <!-- ============ FOOTER CTA ============ -->
-<section class="footer-cta center">
+<section class="join-panel center" id="join">
   <div class="container">
     <h2>Ready to join the Lab?</h2>
     <p class="lead" style="max-width:760px;margin:12px auto 0;">
