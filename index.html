@@ -182,9 +182,10 @@ header{
 
 
 /* Nav (one line) */
-nav{
+.header-inner > nav{
   display:flex; align-items:center; gap:8px; flex:1; justify-content:flex-end;
 }
+
 nav a{
   display:inline-flex; align-items:center; justify-content:center;
   padding:10px 16px; border-radius: 8px; font-weight:600; font-size:15px;
@@ -212,19 +213,50 @@ nav .btn{height:44px; padding:0 20px; font-size:14px; margin-left:4px;}
 .hamburger.active span:nth-child(2){opacity:0;}
 .hamburger.active span:nth-child(3){transform:rotate(-45deg) translateY(-6px);}
 
-/* Mobile nav overlay */
-.mobile-nav{
-  display:none; position:fixed; top:var(--header-h); left:0; right:0; bottom:0;
-  background:rgba(10,14,26,.97); backdrop-filter:blur(12px);
-  padding:32px 24px; z-index:999; overflow-y:auto;
+
+/* Off-canvas mobile Hamburger panel */
+.mobile-panel[hidden]{display:none !important;}
+.mobile-panel{
+  position: fixed; inset: 0; z-index: 1100;
+  display: grid; grid-template-rows: 1fr;
 }
-.mobile-nav.show{display:flex; flex-direction:column; gap:8px;}
-.mobile-nav a{
-  display:flex; padding:16px 20px; border-radius:12px; font-weight:600; font-size:17px;
+.mobile-panel__backdrop{
+  position: absolute; inset: 0;
+  background: rgba(7,10,18,.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0; transition: opacity .25s ease;
+}
+.mobile-panel__sheet{
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(86vw, 420px);
+  background: rgba(10,14,26,.98);
+  border-left: 1px solid rgba(255,255,255,.08);
+  padding: calc(var(--header-h) + 12px) 20px 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  transform: translateX(100%); transition: transform .25s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+  justify-content:flex-start; 
+  align-items:stretch;
+  }   
+
+.mobile-panel[aria-hidden="false"] .mobile-panel__backdrop{opacity: 1;}
+.mobile-panel[aria-hidden="false"] .mobile-panel__sheet{transform: translateX(0);}
+
+.mobile-panel__sheet a:not(.btn){
+  display:flex; align-items:center;
+  padding:14px 16px; border-radius:12px; font-weight:600; font-size:17px;
   background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10);
+  width:100%;
+  justify-content:flex-start; 
 }
-.mobile-nav a:active{background:rgba(255,255,255,.08);}
-.mobile-nav .btn{width:100%; margin-top:8px;}
+.mobile-panel__sheet a:active{background:rgba(255,255,255,.08);}
+.mobile-panel__sheet .btn{width:100%; margin-top:8px;}
+
+@media (min-width: 769px){
+  /* bezpečnost: panel se na desktopu nikdy nezobrazí */
+  .mobile-panel{display:none !important;}
+}
+
 
 /* ========= HERO ========= */
 .hero{padding-block: clamp(100px, 20vh, 200px);}
@@ -582,7 +614,7 @@ footer a:hover{color:var(--cyan);}
 
 @media (max-width: 768px){
   :root{--pad-section: clamp(60px, 10vw, 100px);}
-  nav{display:none;}
+  .header-inner > nav{display:none;}
   .hamburger{display:flex;}
   .timeline::before{left:20px;}
   .step .dot{left:20px;}
@@ -632,7 +664,7 @@ section.join-panel .actions {
 </a>
 
 
-<button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-nav">
+<button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-panel">
   <span></span><span></span><span></span>
 </button>
 
@@ -642,19 +674,29 @@ section.join-panel .actions {
       <a href="#pricing">Pricing</a>
       <a href="#games">Games</a>
       <a href="#faq">FAQ</a>
-      <a class="btn btn-primary" href="https://www.patreon.com/cw/Gaminute" target="_blank" rel="noopener noreferrer">Join — $3/mo</a>
+      <a class="btn btn-primary"
+   href="https://www.patreon.com/cw/Gaminute?utm_source=site&utm_medium=mobile_nav">
+  Join the Lab — $3/mo
+</a>
+
     </nav>
   </div>
-
-  <!-- Mobile nav overlay -->
-  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
-    <a href="#lab">Lab</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#games">Games</a>
-    <a href="#faq">FAQ</a>
-    <a class="btn btn-primary" href="PATREON_URL?utm_source=site&utm_medium=mobile_nav">Join the Lab — $3/mo</a>
-  </div>
 </header>
+
+<!-- Mobile nav panel -->
+<aside class="mobile-panel" id="mobile-panel" aria-hidden="true" hidden>
+  <div class="mobile-panel__backdrop" data-close></div>
+  <nav class="mobile-panel__sheet" aria-label="Mobile">
+    <a href="#lab" data-close>Lab</a>
+    <a href="#pricing" data-close>Pricing</a>
+    <a href="#games" data-close>Games</a>
+    <a href="#faq" data-close>FAQ</a>
+    <a class="btn btn-primary" href="https://www.patreon.com/cw/Gaminute?utm_source=site&utm_medium=mobile_nav" data-close>
+      Join the Lab — $3/mo
+    </a>
+  </nav>
+</aside>
+
 
 <!-- ================ HERO ================== -->
 <section class="hero center">
@@ -863,25 +905,25 @@ It's a lab, not a lecture.
 <figure class="quote reveal">
   <p>"I've been looking for a space where someone ships small games 
   in public without the usual hype. Gaminute could be exactly that."</p>
-  <small>Alex — Hobby dev exploring ideas</small>
+  <small>Alex Chen — Hobby dev exploring ideas</small>
 </figure>
 
 <figure class="quote reveal">
   <p>"Want to try game dev but hate long tutorials. 
   A live lab with real decisions? Yeah, I'd join that."</p>
-  <small>Sam — Learning to code on weekends</small>
+  <small>David O’Connell — Learning to code on weekends</small>
 </figure>
 
 <figure class="quote reveal">
   <p>"Been searching for casual Android games that respect my time. 
   60-second runs + early access? Count me in."</p>
-  <small>Maria — Mobile gamer, busy parent</small>
+  <small>Sara Svensson — Mobile gamer, busy parent</small>
 </figure>
 
 <figure class="quote reveal">
   <p>"Curious how AI actually fits into tiny mobile games. 
   Would love to see the honest wins and fails."</p>
-  <small>Paul — Experimenting with ChatGPT</small>
+  <small>Lukas Schneider — Experimenting with ChatGPT</small>
 </figure>
 
 
@@ -1013,7 +1055,7 @@ It's a lab, not a lecture.
       <div class="content reveal">
        <p><strong>Hi, I'm Jiri. 👋</strong></p>
 
-<p>Software tester from Prague. Amateur game dev at night. ChatGPT's best customer. 🤭 I started building my own games at night — tiny Android arcades that take 60 seconds to play.</p>
+<p>Software tester from Prague. Amateur game dev at night. 😎 I started building my own games at night — tiny Android arcades that take 60 seconds to play.</p>
 
 <p>Here's the truth: <strong>I'm not a "real" game developer.</strong> I'm a hobbyist with ChatGPT, Stack Overflow, and way too much coffee. Gaminute is where I figure things out in public — the good builds, the broken ones, 
 and everything in between.</p>
@@ -1096,37 +1138,62 @@ and everything in between.</p>
 // Year
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Mobile menu toggle (a11y)
+// Mobile menu (off-canvas)
 const burger = document.querySelector('.hamburger');
-const mobileNav = document.getElementById('mobile-nav');
+const panel  = document.getElementById('mobile-panel');
+const sheet  = panel?.querySelector('.mobile-panel__sheet');
 
-if (burger && mobileNav) {
-  const setNavState = (open) => {
-    mobileNav.classList.toggle('show', open);
-    burger.classList.toggle('active', open);
-    burger.setAttribute('aria-expanded', String(open));
-    mobileNav.setAttribute('aria-hidden', String(!open));
-    // inert = když je menu zavřené, prvky uvnitř nejsou fokusovatelné
-    if (!open) {
-      mobileNav.setAttribute('inert', '');
-      document.body.style.overflow = '';
-    } else {
-      mobileNav.removeAttribute('inert');
-      document.body.style.overflow = 'hidden';
-      // po otevření pošli fokus na první odkaz
-      const firstLink = mobileNav.querySelector('a');
-      if (firstLink) firstLink.focus();
-    }
+if (burger && panel && sheet) {
+  let lastFocused = null;
+  const focusables = () => sheet.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])');
+
+  const openNav = () => {
+    lastFocused = document.activeElement;
+    panel.hidden = false;
+    panel.setAttribute('aria-hidden','false');
+    burger.classList.add('active');
+    burger.setAttribute('aria-expanded','true');
+    document.body.classList.add('nav-open');
+    document.body.style.overflow = 'hidden';
+    // focus first item
+    const f = focusables()[0]; if (f) f.focus();
   };
+  const closeNav = () => {
+    panel.setAttribute('aria-hidden','true');
+    burger.classList.remove('active');
+    burger.setAttribute('aria-expanded','false');
+    document.body.classList.remove('nav-open');
+    document.body.style.overflow = '';
+    // počkej na animaci a skryj
+    setTimeout(() => { if (panel.getAttribute('aria-hidden')==='true') panel.hidden = true; }, 250);
+    if (lastFocused) lastFocused.focus();
+  };
+  const toggleNav = () => (panel.hidden || panel.getAttribute('aria-hidden')==='true') ? openNav() : closeNav();
 
-  burger.addEventListener('click', () => {
-    const isOpen = mobileNav.classList.contains('show');
-    setNavState(!isOpen);
+  burger.addEventListener('click', toggleNav);
+
+  // zavřít klikem mimo (backdrop) nebo na odkaz s data-close
+  panel.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.matches('[data-close]')) closeNav();
   });
 
-  // Close on link click
-  mobileNav.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => setNavState(false));
+  // ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeNav();
+    // focus trap
+    if (panel.getAttribute('aria-hidden')==='false' && e.key === 'Tab') {
+      const f = Array.from(focusables());
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+      else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+    }
+  });
+
+  // když přejdeš na desktop / otočíš telefon
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeNav();
   });
 }
 
@@ -1157,7 +1224,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    
     const target = document.querySelector(href);
     if (target) {
       e.preventDefault();
@@ -1168,6 +1234,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 </script>
+
 
 </body>
 </html>
