@@ -3,860 +3,1149 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gaminute - I'm gaming it!</title>
-<meta name="description" content="Gaminute is a solo Android mobile game lab making tiny, replayable arcade games. Read the public developer diary and try early playtest builds." />
-<!-- Favicon -->
-<link rel="icon" href="gaminute_logo.webp" type="image/webp" sizes="32x32">
-<link rel="shortcut icon" href="gaminute_logo.webp" type="image/webp">
-<link rel="icon" href="gaminute_logo.webp" type="image/webp" sizes="192x192">
+<title>Gaminute — Indie Android Game Lab & Community</title>
+<meta name="description" content="Join an indie Android game lab and community. Play early builds, read honest dev notes, and vote on small features." />
+<!-- Favicon (rychlé řešení se stávajícím logem) -->
+<link rel="icon" type="image/png" sizes="16x16" href="/gaminute_logo.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/gaminute_logo.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/gaminute_logo.png">
+<link rel="apple-touch-icon" href="/gaminute_logo.png">
+<meta name="theme-color" content="#0a0e1a">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
+<!-- Security via meta (works on static hosting) -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  img-src 'self' data: https:;
+  font-src 'self' https://fonts.gstatic.com;
+  connect-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'none';
+  upgrade-insecure-requests">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+
+
+<!-- Canonical -->
+<link rel="canonical" href="https://gaminute.com/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gaminute — Indie Android Game Lab & Community">
+<meta property="og:description" content="Join an indie Android game lab and community. Play early builds, read honest dev notes, and vote on small features.">
+<meta property="og:url" content="https://gaminute.com/">
+<meta property="og:image" content="https://gaminute.com/gaminute_og.jpg">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Gaminute — Indie Android Game Lab & Community">
+<meta name="twitter:description" content="Join an indie Android game lab and community. Play early builds, read honest dev notes, and vote on small features.">
+<meta name="twitter:image" content="https://gaminute.com/gaminute_og.jpg">
+
+<!-- Fonts perf -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
+
 <style>
+/* ========= CSS VARIABLES ========= */
 :root{
-  --red:#ff5757;
-  --cyan:#5ce1e6;
-  --bg:#0b0f14;
-  --text:#e7edf4;
-  --text-dim:#a6b4c2;
+  /* Brand palette */
+  --cyan:#00d4ff;
+  --pink:#ff3366;
+  --bg:#0a0e1a;
+  --surface:#141b2e;
+  --surface-2:#1a2333;
+  --text:#e8f0f7;
+  --dim:#8a9db5;
+  --tertiary:#5a6b7f;
+  --success:#00ff88;
+
+  /* Layout */
+  --container: 1080px;
+  --radius: 16px;
+  --pad-section: clamp(100px, 14vw, 160px);
+  --gap: 24px;
+  --shadow: 0 10px 40px rgba(0,0,0,.4);
+  --header-h: 72px;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
+
+/* ========= RESET / BASE ========= */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--header-h) + 20px);}
 body{
-  font-family:"Rajdhani",sans-serif;
-  background:var(--bg);
-  color:var(--text);
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background: var(--bg);
+  color: var(--text);
   line-height:1.7;
   overflow-x:hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-a,a:visited,a:hover,a:active{text-decoration:none;outline:none;}
-img{max-width:100%;display:block;}
-.container{max-width:1200px;margin:0 auto;padding:0 40px;}
-section{padding:clamp(60px,8vw,120px) 0;}
 
-/* ===== Header ===== */
+/* Deep layered background with gradients + noise */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:-2;
+  background:
+    radial-gradient(1400px 700px at 10% 0%, rgba(0,212,255,.12), transparent 65%),
+    radial-gradient(900px 600px at 90% 25%, rgba(255,51,102,.10), transparent 65%),
+    radial-gradient(1000px 700px at 50% 100%, rgba(0,212,255,.10), transparent 65%),
+    linear-gradient(180deg, #0a0e1a 0%, #0a0f1f 45%, #0a0e1a 100%);
+  pointer-events:none;
+}
+body::after{
+  content:"";
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  opacity:.07; mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.50'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
+
+/* LINKS / BUTTONS */
+a{color:inherit; text-decoration:none; outline:none;}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:56px; padding:0 28px; border-radius:999px; font-weight:700; font-size:16px;
+  letter-spacing:.3px; transition: all .25s cubic-bezier(.4,0,.2,1);
+  border:1px solid transparent; cursor:pointer;
+}
+.btn-primary{
+  background:var(--cyan); color:#071018;
+  box-shadow:0 4px 20px rgba(0,212,255,.25);
+}
+.btn-primary:hover{
+  background:var(--pink); color:#fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(255,51,102,.35);
+}
+.btn-ghost{
+  background:transparent; color:var(--text);
+  border-color:rgba(255,255,255,.20);
+}
+.btn-ghost:hover{
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.35);
+  transform: translateY(-1px);
+}
+
+/* TYPOGRAPHY */
+h1,h2,h3{font-family:"Space Grotesk",sans-serif; font-weight:800; line-height:1.1;}
+h2{font-size: clamp(40px, 5.5vw, 64px); text-align:center; margin-bottom:16px;}
+h3{font-size: clamp(24px, 3.4vw, 32px); font-weight:700;}
+.lead{font-size: clamp(18px, 2.1vw, 21px); color:var(--dim); line-height:1.65;}
+p{margin-bottom:0;}
+
+/* LAYOUT HELPERS */
+.container{max-width:var(--container); margin-inline:auto; padding-inline: clamp(24px, 5vw, 32px);}
+.center{text-align:center;}
+section{padding-block: var(--pad-section);}
+
+/* ========= HEADER ========= */
 header{
-  position:sticky;top:0;z-index:100;
-  background:rgba(11,15,20,.85);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(255,255,255,0.1);
+  position:sticky; top:0; z-index:1000;
+  backdrop-filter: blur(12px);
+  background:rgba(10,14,26,.90);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  height:var(--header-h);
 }
-.nav{
-  max-width:1200px;margin:0 auto;
-  display:flex;justify-content:space-between;align-items:center;
-  padding:14px 32px;
+.header-inner{
+  display:flex; align-items:center; justify-content:space-between;
+  height:100%; gap:32px;
 }
+
+/* Brand */
 .brand{
-  display:flex;align-items:center;
-  font-family:"Orbitron",sans-serif;font-weight:900;
-  font-size:28px;letter-spacing:1px;
-  color:var(--cyan);
-}
-.brand span{color:var(--red);}
-.brand img{height:36px;width:auto;}
-nav ul{list-style:none;display:flex;gap:32px;}
-nav a{color:var(--text);font-weight:600;transition:color .2s;}
-nav a:hover{color:var(--cyan);}
-
-/* ===== Hamburger ===== */
-.menu-toggle{display:none;flex-direction:column;justify-content:center;width:30px;height:24px;gap:5px;cursor:pointer;}
-.menu-toggle span{background:var(--text);height:3px;width:100%;border-radius:2px;transition:all .3s;}
-.menu-toggle.active span:nth-child(1){transform:rotate(45deg) translateY(8px);}
-.menu-toggle.active span:nth-child(2){opacity:0;}
-.menu-toggle.active span:nth-child(3){transform:rotate(-45deg) translateY(-8px);}
-nav ul.mobile{
-  display:none;flex-direction:column;background:rgba(11,15,20,0.97);
-  position:absolute;top:70px;right:0;width:100%;text-align:center;
-  border-top:1px solid rgba(255,255,255,0.1);
-}
-nav ul.mobile li{padding:18px 0;}
-nav ul.mobile.show{display:flex;}
-
-/* ===== Hero ===== */
-.hero{
-  min-height:100vh;
-  display:flex;justify-content:center;align-items:center;
-  text-align:center;position:relative;overflow:hidden;
-  background:url("backgroundhero.webp") center/cover no-repeat;
-  padding:0 40px;
-}
-.hero::after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(to bottom,rgba(11,15,20,0.5),rgba(11,15,20,0.9) 80%,#0b0f14 100%);
-  z-index:1;
-}
-.hero-inner{position:relative;z-index:2;max-width:900px;margin:auto;}
-h1{
-  font-family:"Orbitron",sans-serif;
+  display:flex; align-items:center;
+  gap:12px;
+  font-family:"Orbitron", sans-serif;
   font-weight:900;
-  font-size:clamp(70px,12vw,160px);
-  letter-spacing:2px;
-  color:var(--cyan);
+  font-size:24px;
+  letter-spacing:-0.3px; 
+  transition:opacity .2s ease;
 }
-h1 .red{color:var(--red);}
-.sub{
-  font-size:clamp(22px,2.4vw,28px);
-  font-weight:600;color:var(--text-dim);
-  margin-top:24px;max-width:700px;margin-inline:auto;
-}
-.actions{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:48px;}
-.cta,.btn{
-  font-family:"Rajdhani",sans-serif;font-weight:700;font-size:18px;
-  padding:14px 28px;border-radius:50px;letter-spacing:.5px;cursor:pointer;transition:all .25s;
-}
-.cta{background:var(--cyan);color:#000;box-shadow:0 0 20px rgba(92,225,230,.5);}
-.cta:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(92,225,230,.8);}
-.btn{border:1px solid var(--red);color:var(--red);background:transparent;}
-.btn:hover{background:var(--red);color:#fff;box-shadow:0 0 25px rgba(255,87,87,.5);transform:translateY(-2px);}
+.brand:hover{opacity:.85;}
+.brand img{height:28px; width:auto; filter: drop-shadow(0 0 8px rgba(0,0,0,.3));}
+/* Logo wordmark – barvy a nulová mezera uvnitř slova */
+.brand-word{display:inline-flex; gap:0; line-height:1;}
+.brand .ga{color: var(--pink);}     /* červená „Ga“ */
+.brand .minute{color: var(--cyan);} /* modré „minute“ */
 
-/* stejné rozměry a vzhled pro všechna .cta a .btn na webu */
-.cta, .btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+
+/* Nav (one line) */
+nav{
+  display:flex; align-items:center; gap:8px; flex:1; justify-content:flex-end;
+}
+nav a{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 16px; border-radius: 8px; font-weight:600; font-size:15px;
+  color: var(--text); transition: all .2s ease;
+}
+nav a:hover{
+  color: var(--cyan);
+  background: rgba(255,255,255,.06);
+}
+nav .btn{height:44px; padding:0 20px; font-size:14px; margin-left:4px;}
+
+/* Mobile menu toggle */
+.hamburger{
+  display:none; flex-direction:column; gap:4px; cursor:pointer;
+  width:32px; height:32px; align-items:center; justify-content:center;
+  border-radius:6px; border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.05); transition: all .2s ease;
+}
+.hamburger span{
+  display:block; width:18px; height:2px; background:var(--text); border-radius:2px;
+  transition: all .3s ease;
+}
+.hamburger:hover{background:rgba(255,255,255,.10);}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translateY(6px);}
+.hamburger.active span:nth-child(2){opacity:0;}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translateY(-6px);}
+
+/* Mobile nav overlay */
+.mobile-nav{
+  display:none; position:fixed; top:var(--header-h); left:0; right:0; bottom:0;
+  background:rgba(10,14,26,.97); backdrop-filter:blur(12px);
+  padding:32px 24px; z-index:999; overflow-y:auto;
+}
+.mobile-nav.show{display:flex; flex-direction:column; gap:8px;}
+.mobile-nav a{
+  display:flex; padding:16px 20px; border-radius:12px; font-weight:600; font-size:17px;
+  background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.10);
+}
+.mobile-nav a:active{background:rgba(255,255,255,.08);}
+.mobile-nav .btn{width:100%; margin-top:8px;}
+
+/* ========= HERO ========= */
+.hero{padding-block: clamp(100px, 20vh, 200px);}
+.hero .kicker{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:8px 14px; border-radius:999px;
+  background:rgba(0,212,255,.08); border:1px solid rgba(0,212,255,.25);
+  color:#b8e7ff; font-weight:700; font-size:13px; letter-spacing:.5px;
+  margin-bottom:20px; backdrop-filter:blur(6px);
+}
+.hero .kicker::before{
+  content:""; width:8px; height:8px; border-radius:50%;
+  background:var(--success); box-shadow:0 0 12px var(--success);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%, 100%{opacity:1; transform:scale(1);}
+  50%{opacity:.6; transform:scale(.9);}
+}
+.hero h1{
+  font-size: clamp(48px, 9vw, 96px); line-height:1.05; margin-bottom:18px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--text) 50%, var(--pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero .lead{max-width: 820px; margin: 0 auto 18px; font-size:clamp(19px, 2.4vw, 23px);}
+.hero .trust{
+  margin-top:12px; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;
+  color:var(--dim); font-size:14px; font-weight:600;
+}
+.hero .trust span{display:flex; align-items:center; gap:6px;}
+.hero .trust .live{color:var(--success); font-weight:700;}
+.hero .actions{
+  margin-top:32px; display:flex; align-items:center; justify-content:center;
+  gap:14px; flex-wrap:wrap;
+}
+.hero .tiny{
+  display:block; margin-top:14px; font-size:14px; color:var(--dim); opacity:.85;
+}
+
+/* ========= INSIDE THE LAB (6 CARDS) ========= */
+.grid-3{
+  display:grid; gap:18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+.card{
+  background: linear-gradient(135deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.02) 100%);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  padding:22px;
+  box-shadow: var(--shadow);
+  transition: all .3s cubic-bezier(.4,0,.2,1);
+  position:relative; overflow:hidden;
+}
+.card::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+  opacity:0; transition: opacity .3s ease;
+}
+.card:hover{
+  transform: translateY(-6px);
+  border-color: rgba(0,212,255,.35);
+  background: linear-gradient(135deg, rgba(0,212,255,.08) 0%, rgba(255,51,102,.06) 100%);
+}
+.card:hover::before{opacity:1;}
+.card .icon{
+  width:32px; height:32px; margin-bottom:12px; color:var(--cyan);
+  filter: drop-shadow(0 0 10px rgba(0,212,255,.3));
+}
+.card h3{margin-bottom:8px; font-size:22px;}
+.card p{color: var(--dim); font-size:16px; line-height:1.6;}
+
+.lab-footer{
+  margin-top:40px; padding-top:32px;
+  border-top:1px solid rgba(255,255,255,.10);
+}
+.lab-footer .meta{
+  display:flex; align-items:center; justify-content:center; gap:24px; flex-wrap:wrap;
+  margin-bottom:18px; color:var(--dim); font-weight:700; font-size:15px;
+}
+.lab-footer .meta span{display:flex; align-items:center; gap:6px;}
+
+/* ========= HOW IT WORKS (TIMELINE) ========= */
+.timeline{
+  position:relative; margin: 48px auto 0; max-width: 860px;
+}
+
+.step{
+  position:relative; width:100%; display:flex; justify-content:center;
+  margin-bottom:24px;
+}
+.step:first-child .step-card{border-left: 3px solid var(--cyan);}
+.step:last-child .step-card{border-left: 3px solid var(--pink);}
+.step .step-card{
+  width:min(100%, 760px);
+  background: linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  transition: all .3s ease;
+}
+.step:hover .step-card{
+  border-color: rgba(0,212,255,.30);
+  transform: translateX(4px);
+}
+
+.step h3{text-align:center; margin-bottom:8px; font-size:24px;}
+.step p{color:var(--dim); text-align:center; font-size:17px;}
+
+.no-pressure{
+  margin-top:32px; text-align:center; color:var(--dim); font-size:15px;
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12); border-radius: 14px;
+  display:inline-block; padding:14px 20px; font-weight:600;
+}
+
+/* ========= WHO IT'S FOR (PERSONAS) ========= */
+.personas{
+  display:grid; gap:18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  margin-top: 32px;
+}
+.persona{
+  background: linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  padding:20px; box-shadow: var(--shadow);
+  transition: all .3s ease;
+}
+.persona:hover{
+  border-color: rgba(255,51,102,.30);
+  transform: translateY(-4px);
+}
+.persona .p-title{
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+  font-weight:800; font-family:"Space Grotesk",sans-serif; font-size:18px;
+}
+.persona .p-ico{
+  width:26px; height:26px; color:var(--pink);
+  filter: drop-shadow(0 0 8px rgba(255,51,102,.3));
+}
+.persona p{color:var(--dim); font-size:15px;}
+
+/* ========= SOCIAL PROOF ========= */
+.quotes{
+  margin-top: 40px;
+  display:grid; gap:18px;
+  grid-template-columns: repeat(2, 1fr);
+}
+.quote{
+  position:relative;
+  padding:26px; 
+  transition: all .3s ease;
+}
+.quote:hover{
+  border-color: rgba(0,212,255,.25);
+  transform: translateY(-4px);
+}
+.quote::before{
+  content:"\201C"; /* levé uvozovky — bezpečné i když se rozhodí kódování */
+  position:absolute;
+  top:-10px;
+  left:12px;
+  font-family:"Space Grotesk",sans-serif;
+  font-weight:800;
+  font-size:64px;
   line-height:1;
-  --btn-h:60px;
-  height:var(--btn-h);
-  min-width:220px;
-  padding:0 26px;
-  border-radius:999px;
-  vertical-align:middle;
+  color: rgba(255,255,255,.08);
 }
 
-/* dvouřádková varianta (label + sub) */
-.btn--stack{
-  flex-direction:column;
-  gap:4px;
-  line-height:1.05;
-}
-.btn--stack .btn-label{ font-size:18px; }
-.btn--stack .btn-sub{ font-size:12px; font-weight:700; color:#061015; }
-/* subline bude na hover bíle všude */
-.btn--stack:hover .btn-sub{ color:#fff; }
 
-/* mobilní úpravy */
-@media (max-width:640px){
-  .cta, .btn{
-    --btn-h:54px;
-    min-width:min(46vw, 240px);
-    padding:0 20px;
+.quote p{color:#e5eef7; margin-bottom:12px; font-size:16px; line-height:1.6;}
+.quote small{color:var(--dim); font-weight:600;}
+
+.social-proof-meta{
+  margin-top:32px; padding-top:28px; border-top:1px solid rgba(255,255,255,.10);
+}
+.social-proof-meta p{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  color:var(--dim); font-weight:700;
+}
+.social-proof-meta svg{color:var(--cyan);}
+
+/* ========= PRICING (SINGLE CARD) ========= */
+.pricing-wrap{display:flex; justify-content:center;}
+.pricing-card{
+  width:min(100%, 860px);
+  background: linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.15);
+  border-radius: 20px; padding: 32px 28px 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.08);
+  text-align:center; position:relative; overflow:hidden;
+}
+.pricing-card::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:3px;
+  background: linear-gradient(90deg, var(--cyan), var(--pink));
+}
+.pricing-card .eyebrow{
+  font-weight:800; letter-spacing:.5px; color:#b8e7ff; margin-bottom:10px; font-size:14px;
+}
+.price{
+  font-family:"Space Grotesk",sans-serif; font-weight:800;
+  font-size: clamp(32px, 6vw, 48px); margin: 6px 0 12px;
+  background: linear-gradient(135deg, var(--cyan), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.pricing-card ul{
+  text-align:left; margin: 18px auto 6px; max-width: 640px;
+  display:grid; gap:10px;
+}
+.pricing-card li{
+  list-style:none; color:var(--dim); display:flex; gap:12px; align-items:flex-start;
+  font-size:16px; line-height:1.55;
+}
+.pricing-card li::before{
+  content:""; flex:0 0 12px; height:12px; margin-top:6px; border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, #fff, var(--cyan));
+  box-shadow:0 0 14px rgba(0,212,255,.45);
+}
+
+.trust-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+  gap:12px; margin-top:20px; max-width:700px; margin-inline:auto;
+}
+.trust-item{
+  display:flex; gap:8px; align-items:center;
+  color:var(--dim); font-size:14px; font-weight:600;
+  padding:10px 14px; border-radius:10px;
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);
+}
+.trust-item svg{width:16px; height:16px; color:var(--cyan); flex-shrink:0;}
+
+/* ========= GAMES ========= */
+.games-grid{
+  display:grid; gap:20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  margin-top: 28px;
+}
+.game-card{
+  border:1px solid rgba(255,255,255,.12); border-radius:20px;
+  background: linear-gradient(135deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  overflow:hidden; box-shadow: var(--shadow);
+  transition: all .3s ease;
+}
+.game-card:hover{
+  border-color: rgba(0,212,255,.30);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5);
+}
+.game-thumb{position:relative; aspect-ratio: 3/4; overflow:hidden; background:rgba(0,0,0,.2);}
+.game-thumb img{
+  width:100%; height:100%; object-fit: cover;
+  transform: scale(1.02); transition: transform .4s ease;
+}
+.game-card:hover .game-thumb img{transform: scale(1.08);}
+.badges{
+  position:absolute; left:12px; top:12px; display:flex; gap:6px; flex-wrap:wrap;
+}
+.badge{
+  display:inline-flex; padding:6px 12px; border-radius:999px;
+  font-size:12px; font-weight:800; letter-spacing:.3px;
+  color:#e0f2ff; background: rgba(20,27,46,.75); border:1px solid rgba(255,255,255,.20);
+  backdrop-filter: blur(8px); box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+.game-body{padding:18px 20px 20px;}
+.game-title{
+  font-family:"Space Grotesk",sans-serif; font-weight:800; font-size:24px; margin-bottom:8px;
+}
+.game-copy{color:var(--dim); font-size:15px; line-height:1.55;}
+
+.games-note{
+  margin-top:28px; text-align:center;
+  color:var(--cyan); font-weight:700; font-size:15px;
+}
+.games-note svg{
+  display:inline; width:18px; height:18px; margin-right:4px; vertical-align:middle;
+}
+
+/* ========= ABOUT ========= */
+.about{
+  display:grid; gap:32px;
+  grid-template-columns: 1fr 1.5fr;
+  align-items:center;
+}
+.about .photo{
+  aspect-ratio: 3/4; border-radius: 20px; overflow:hidden;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.05);
+  background: rgba(255,255,255,.02);
+}
+.about .photo img{width:100%; height:100%; object-fit: cover;}
+.about .content p{
+  color:var(--dim); margin-bottom:18px; font-size:17px; line-height:1.65;
+}
+.about .content p:last-of-type{margin-bottom:0;}
+.about strong{color:#f5f9ff; font-weight:700;}
+.about .actions{margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;}
+
+/* ========= FAQ ========= */
+details{
+  border:1px solid rgba(255,255,255,.15); border-radius:16px; padding:18px 22px;
+  background: rgba(255,255,255,.04); margin-bottom:14px;
+  transition: all .3s ease;
+}
+details:hover{border-color: rgba(255,255,255,.25);}
+summary{
+  cursor:pointer; font-weight:700; font-size:18px; list-style:none;
+  display:flex; align-items:center; justify-content:space-between;
+}
+summary::-webkit-details-marker{display:none;}
+summary::after{
+  content:"›"; font-size:28px; color:var(--cyan); transform:rotate(90deg);
+  transition: transform .3s ease;
+}
+details[open] summary::after{transform:rotate(-90deg);}
+details[open]{
+  background: rgba(255,255,255,.06);
+  border-color: rgba(0,212,255,.25);
+}
+details .desc{margin-top:12px; color:var(--dim); font-size:16px; line-height:1.6;}
+details .desc a{color:var(--cyan); text-decoration:underline;}
+
+/* ========= FOOTER CTA / FOOTER ========= */
+.footer-cta{
+  padding-block: clamp(80px, 12vw, 140px);
+  background: linear-gradient(180deg, transparent 0%, rgba(0,212,255,.03) 100%);
+}
+.footer-cta .actions{
+  margin-top:24px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
+}
+
+footer{
+  border-top:1px solid rgba(255,255,255,.12);
+  text-align:center; padding:32px 0 50px; color:var(--dim); font-size:15px;
+}
+footer a{color:var(--dim); transition: color .2s ease;}
+footer a:hover{color:var(--cyan);}
+
+/* ========= REVEAL ON SCROLL ========= */
+.reveal{
+  opacity:0; transform: translateY(20px);
+  transition: opacity .7s cubic-bezier(.4,0,.2,1), transform .7s cubic-bezier(.4,0,.2,1);
+}
+.reveal.show{opacity:1; transform: translateY(0);}
+
+/* ========= RESPONSIVE ========= */
+@media (max-width: 1024px){
+  .about{grid-template-columns: 1fr;}
+  .about .photo{max-width:420px; margin-inline:auto;}
+}
+
+@media (max-width: 768px){
+  :root{--pad-section: clamp(60px, 10vw, 100px);}
+  nav{display:none;}
+  .hamburger{display:flex;}
+  .timeline::before{left:20px;}
+  .step .dot{left:20px;}
+  .hero h1{font-size: clamp(40px, 10vw, 72px);}
+  .btn{height:52px; padding:0 24px;}
+  h2{font-size: clamp(32px, 8vw, 48px);}
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
-
-/* Patreon: plná červená varianta se stejnými rozměry jako ostatní */
-.btn--patreon{
-  background: var(--red);
-  color: #fff;
-  border: none;
-  box-shadow: 0 0 20px rgba(255,87,87,.35);
-}
-
-/* podtitul může zůstat šedší; pokud chceš světlejší, odkomentuj další řádek */
-/* .btn--patreon .btn-sub { color: rgba(255,255,255,.9); } */
-
-/* Hover: žádná změna barvy, jen „lift + silnější stín“ */
-.btn--patreon:hover{
-  background: var(--red);   /* přepíše default .btn:hover */
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(255,87,87,.6);
-}
-
-
-/* (volitelné) zachovej zarovnání obsahu v .actions řádku */
-.actions{ align-items:center; }
-
-
-/* ===== Section Titles ===== */
-section h2{
-  font-family:"Orbitron",sans-serif;font-weight:900;text-align:center;
-  font-size:clamp(36px,5vw,72px);margin-bottom:30px;
-}
-#games h2{color:var(--cyan);} #about h2{color:var(--red);}
-#faq h2,#contact h2{color:var(--cyan);}
-
-/* ===== Games ===== */
-#games{background:linear-gradient(180deg,#0b0f14,#121a24);}
-.game-block{display:flex;align-items:center;justify-content:space-between;gap:60px;margin-bottom:120px;}
-.game-text{flex:1;font-size:20px;color:var(--text-dim);max-width:600px;}
-.game-text h3{font-family:"Orbitron",sans-serif;color:var(--red);font-weight:900;font-size:42px;margin-bottom:16px;}
-.game-text ul{list-style:disc;margin:14px 0 14px 1.4rem;padding-left:0.6rem;}
-.game-text li{margin:6px 0;}
-.game-image{flex:1;width:100%;max-width:560px;aspect-ratio:3/4;min-height:480px;border-radius:20px;box-shadow:0 0 40px rgba(92,225,230,.1);overflow:hidden;margin-inline:auto;background:rgba(255,255,255,0.02);}
-.game-image img{width:100%;height:100%;object-fit:cover;border-radius:18px;}
-.game-block:nth-child(even){flex-direction:row-reverse;}
-.lead{font-size:18px;}
-.teaser-grid{display:grid;grid-template-columns: repeat(3, 1fr);gap:28px;}
-.teaser-card{border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);border-radius:16px;padding:16px;box-shadow:0 0 18px rgba(92,225,230,.06);}
-.teaser-thumb{aspect-ratio: 3/4;overflow:hidden;border-radius:12px;background:rgba(255,255,255,0.04);margin-bottom:12px;}
-.teaser-thumb img{width:100%;height:100%;object-fit:cover;}
-.teaser-card h3{font-family:"Orbitron",sans-serif;font-weight:900;color:var(--cyan);font-size:24px;margin:4px 0 8px;}
-.teaser-copy{color:var(--text-dim);font-size:16px;}
-@media(max-width:900px){.teaser-grid{grid-template-columns:1fr;gap:18px;}}
-
-/* ===== About (clean) ===== */
-#about { 
-  background: linear-gradient(180deg,#121a24,#0b0f14);
-}
-
-.about-grid{
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 32px;
-  align-items: start;             /* rovnou správně k topu */
-}
-
-.about-photo{
-  aspect-ratio: 1/1;
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid rgba(92,225,230,.25);
-  box-shadow: 0 0 32px rgba(92,225,230,.09);
-  align-self: start;
-}
-.about-photo img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;                 /* bez mezer kolem obrázku */
-}
-
-/* Hlavní About headline už dědí z section h2, netřeba stylovat zvlášť */
-
-/* Podnadpisy (stejný look jako h3 v kartách „Project 1/2/3“) */
-.about-sub{
-  font-family:"Orbitron",sans-serif;
-  font-weight:900;
-  color: var(--cyan);
-  font-size: 24px;
-  margin: 16px 0 8px;
-}
-
-/* Textové odstavce v About (sjednocené copy proměnné) */
-.about-copy p{
-  font-size: var(--copy-size);
-  font-weight: var(--copy-weight);
-  line-height: 1.65;
-  color: var(--copy-color);
-  margin: 0;                     /* bez výchozích okrajů */
-}
-
-/* Úvodní odstavec – výraznější */
-.about-lead{
-  font-size: clamp(20px,2vw,22px);
-  font-weight: 800;
-  line-height: 1.6;
-  color: #eaf1f7;
-  margin: 0;
-}
-
-/* CTA pod textem */
-.about-cta-center{ 
-  margin-top: 12px; 
-}
-
-/* Responsivita */
-@media (max-width:900px){
-  .about-grid{ grid-template-columns: 1fr; }
-  .about-photo{ max-width: 420px; margin: 0 auto; }
-}
-
-
-
-/* ===== PATREON (simple, clean) ===== */
-#patreon{background:linear-gradient(180deg,#0b0f14,#101722);}
-#patreon .intro{max-width:900px;margin:0 auto;text-align:center;}
-#patreon .intro h2{color:var(--cyan);margin-bottom:10px;}
-#patreon .intro p{color:var(--text-dim);font-size:20px;max-width:720px;margin:0 auto 24px;}
-
-/* podnadpis "What you get" */
-#patreon .p-subtitle{
-  font-family:"Orbitron",sans-serif;
-  color:var(--red);
-  text-align:center;
-  font-size:28px;
-  font-weight:900;
-  margin:8px 0 18px;
-}
-
-/* stylová tabulka 2 sloupce (Free vs Supporter) */
-/* stylová tabulka: Benefit + Free follower + Supporter ($3) */
-.p-table{
-  max-width: 980px;
-  margin: 0 auto 24px;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 14px;
-  background: rgba(255,255,255,.03);
-  overflow: hidden;                 /* žádný horizontální posuvník */
-}
-
-.p-table table{
-  width: 100%;
-  border-collapse: collapse;        /* zarovná okraje buněk */
-  table-layout: fixed;              /* drží šířky sloupců, text se zalamuje */
-}
-
-/* šířky sloupců (funguje i bez <colgroup>) */
-.p-table th, .p-table td{
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  white-space: normal;
-  word-break: break-word;
-}
-
-.p-table thead th{
-  font-family: "Orbitron", sans-serif;
-  text-transform: uppercase;
-  font-size: 14px;
-  letter-spacing: .8px;
-  color: #fff;
-  background: rgba(255,255,255,.04);
-}
-
-.p-table tbody tr:last-child td{ border-bottom: none; }
-
-/* šířky sloupců – kratší Benefit, dva stejné pravé */
-.p-table th:nth-child(1), .p-table td:nth-child(1){ width: 36%; color: var(--text-dim); }
-.p-table th:nth-child(2), .p-table td:nth-child(2){ width: 32%; text-align: center; }
-.p-table th:nth-child(3), .p-table td:nth-child(3){ width: 32%; text-align: center; }
-
-/* zvýraznění Supporter sloupce (bez <colgroup> triků) */
-.p-table th:nth-child(3), .p-table td:nth-child(3){
-  background: rgba(92,225,230,.06);
-}
-
-/* ikony/znaky ano/ne */
-.p-table .yes{ font-weight: 800; }
-.p-table .no{ opacity: .5; }
-
-/* CTA pod tabulkou (využívá existující .btn & .btn--stack z hero) */
-.p-cta-center{ text-align: center; margin-top: 8px; }
-.p-note{ color: var(--text-dim); text-align: center; font-size: 14px; margin-top: 8px; }
-
-/* Mobilní doladění */
-@media (max-width: 600px){
-  .p-table th, .p-table td{ padding: 10px 12px; }
-  .p-table thead th{ font-size: 12px; }
-  /* trochu víc místa Benefitu, ale pořád krátké */
-  .p-table th:nth-child(1), .p-table td:nth-child(1){ width: 38%; }
-  .p-table th:nth-child(2), .p-table td:nth-child(2),
-  .p-table th:nth-child(3), .p-table td:nth-child(3){ width: 31%; }
-}
-
-
-
-/* ===== FAQ / Contact / Footer ===== */
-#faq{background:#0b0f14;}
-#faq .container{max-width:900px;}
-details{border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:16px 20px;background:#101720;margin-bottom:14px;}
-summary{cursor:pointer;font-weight:700;font-size:20px;}
-details[open]{background:#131c28;}
-.desc{margin-top:10px;color:var(--text-dim);font-size:18px;}
-#contact{text-align:center;padding:80px 0;background:#0b0f14;}
-#contact .container{max-width:900px;}
-.email-link{display:inline-block;font-size:28px;font-weight:700;color:var(--red);}
-#final-slogan{background:var(--bg);text-align:center;padding:50px 20px 100px;}
-#final-slogan h2{font-family:"Orbitron",sans-serif;font-weight:900;font-size:clamp(28px,7vw,56px);color:var(--cyan);white-space:nowrap;}
-#final-slogan .red{color:var(--red);}
-footer{border-top:1px solid rgba(255,255,255,0.1);text-align:center;padding:24px 0 40px;color:var(--text-dim);font-size:15px;}
-/* CONTACT – compact glass card + details */
-#contact{ background:#0b0f14; }
-#contact h2{ margin-bottom:14px; }
-
-.contact-wrap{
-  display:flex; justify-content:center;
-}
-
-.contact-card{
-  width:min(740px, 96%);
-  margin:0 auto;
-  padding:22px 22px 26px;
-  border-radius:18px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-  border:1px solid rgba(92,225,230,.12);
-  box-shadow:
-    0 10px 36px rgba(0,0,0,.35),
-    inset 0 0 0 1px rgba(255,255,255,.02);
-}
-
-.contact-head{
-  display:flex; align-items:center; justify-content:center; gap:10px;
-  margin-bottom:8px;
-}
-.contact-icon{
-  width:28px; height:28px; color:var(--cyan);
-  filter: drop-shadow(0 0 8px rgba(92,225,230,.35));
-}
-
-.contact-mail{
-  display:inline-block;
-  font-size:clamp(22px,3vw,30px);
-  font-weight:800;
-  color:var(--red);
-  letter-spacing:.2px;
-}
-
-/* Contact – text pod e-mailem ve stejném stylu jako body copy */
-.contact-sub{
-  font-size: var(--copy-size);
-  font-weight: var(--copy-weight);
-  line-height: 1.65;
-  color: var(--copy-color);
-  margin: 6px 0 10px;  /* jemný rozestup od divideru */
-  text-align: center;
-}
-
-.contact-divider{
-  height:1px; width:120px; margin:14px auto 12px;
-  background:linear-gradient(90deg, transparent, var(--cyan), transparent);
-  opacity:.5; border-radius:2px;
-}
-
-.contact-cta{ margin-top:10px; }
-
-/* malé doladění spacingu celé sekce */
-#contact .container{ max-width:900px; }
-
-
-/* ===== Responsive ===== */
-@media(max-width:900px){
-  .container{padding:0 24px;}
-  .nav{padding:12px 24px;}
-  nav ul{display:none;}
-  .menu-toggle{display:flex;}
-  .hero{padding:0 20px;}
-  .game-block{flex-direction:column !important;align-items:center;gap:28px;margin-bottom:90px;}
-  .game-block:nth-child(even){flex-direction:column !important;}
-  .game-text{font-size:20px;text-align:left;max-width:640px;}
-  .game-image{max-width:380px;min-height:auto;}
-  h1{font-size:clamp(64px,14vw,110px);}
-  .actions{gap:16px;}
-  section h2{font-size:clamp(40px, 8vw, 60px);}
-  .game-text h3{font-size:25px;}
-  #final-slogan h2{font-size:clamp(22px,6vw,40px);}
-  .pane .cards{grid-template-columns:1fr;}
-  .help{grid-template-columns:repeat(2,1fr);}
-}
-
-/* ===== Unified body copy for key sections ===== */
-:root{
-  /* jednotná velikost + barva pro kopírovací text napříč sekcemi */
-  --copy-size: clamp(18px, 1.9vw, 20px);
-  --copy-weight: 600;              /* trochu tučnější pro čitelnost */
-  --copy-color: #dfe7ee;           /* světlejší než --text-dim */
-}
-
-/* Games – lead odstavec + texty na kartách (vč. "Project 1/2/3") */
-#games .lead,
-.teaser-card .teaser-copy{
-  font-size: var(--copy-size);
-  font-weight: var(--copy-weight);
-  line-height: 1.6;
-  color: var(--copy-color);
-}
-
-/* About – všechny odstavce */
-#about .about-inner p{
-  font-size: var(--copy-size);
-  font-weight: var(--copy-weight);
-  line-height: 1.65;
-  color: var(--copy-color);
-}
-
-/* Patreon – úvodní odstavec pod nadpisem */
-#patreon .intro p{
-  font-size: var(--copy-size);
-  font-weight: var(--copy-weight);
-  line-height: 1.65;
-  color: var(--copy-color);
-}
-
-/* FAQ – obsah po rozkliknutí */
-#faq .desc{
-  font-size: var(--copy-size);
-  font-weight: var(--copy-weight);
-  line-height: 1.65;
-  color: var(--copy-color);
-}
-
-/* Grid v About — zarovnat oba sloupce k hornímu okraji */
-.about-grid{ align-items: start; }
-
-/* Pro jistotu i samotný blok s fotkou přiraz k topu */
-.about-photo{ align-self: start; margin-top: 0; }
-
-/* Uvnitř figure žádný dodatečný offset */
-.about-photo img{ display:block; vertical-align: top; }
-
-
-
-@media(max-width:520px){.help{grid-template-columns:1fr;}}
 </style>
 </head>
-<body>
+<body id="top">
 
+<!-- ================ HEADER ================ -->
 <header>
-  <div class="nav">
-    <a class="brand" href="#top">
-      <img src="gaminute_logo.webp" alt="Gaminute logo">
-      <span class="red">Ga</span>minute
-    </a>
-    <nav>
-      <div class="menu-toggle" id="menu-toggle"><span></span><span></span><span></span></div>
-      <ul id="nav-menu">
-        <li><a href="#games">Games</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#patreon">Patreon</a></li>
-        <li><a href="#faq">FAQ</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-      <ul id="nav-menu-mobile" class="mobile"></ul>
+  <div class="container header-inner">
+    <a href="#top" class="brand" aria-label="Gaminute — Home">
+  <img src="gaminute_logo.png" alt="Gaminute hourglass logo">
+  <span class="brand-word"><span class="ga">Ga</span><span class="minute">minute</span></span>
+</a>
+
+
+<button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-nav">
+  <span></span><span></span><span></span>
+</button>
+
+
+    <nav aria-label="Main navigation">
+      <a href="#lab">Lab</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#games">Games</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="https://www.patreon.com/cw/Gaminute" target="_blank" rel="noopener noreferrer">Join — $3/mo</a>
     </nav>
+  </div>
+
+  <!-- Mobile nav overlay -->
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <a href="#lab">Lab</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#games">Games</a>
+    <a href="#faq">FAQ</a>
+    <a class="btn btn-primary" href="PATREON_URL?utm_source=site&utm_medium=mobile_nav">Join the Lab — $3/mo</a>
   </div>
 </header>
 
-<section class="hero" id="top">
-  <div class="hero-inner">
-    <h1><span class="red">Ga</span>minute</h1>
-    <p class="sub">Solo creator Android game lab for tiny arcades. <br>Backstage is on Patreon: wins, mistakes, fixes.</p>
-
+<!-- ================ HERO ================== -->
+<section class="hero center">
+  <div class="container reveal">
+    <span class="kicker">Solo-creator Android Game Lab</span>
+    <h1>Behind every mobile game launch</h1>
+    <p class="lead">
+I'm Jiri from Prague. By day: software tester. By night: building tiny Android games. 
+This is the backstage — early builds, honest notes, all the weird decisions. 
+Zero polish, pure process.
+    </p>
+    <div class="trust">
+      <span class="live">● Join Lab members</span>
+      <span>Cancel anytime</span>
+      <span>Games stay free</span>
+    </div>
     <div class="actions">
-      <a href="#games" class="cta">Explore Games</a>
-<a href="PATREON_URL?utm_source=site&utm_medium=hero&utm_campaign=cta_button"
-   class="btn btn--stack btn--patreon">
-  <span class="btn-label">Follow on Patreon</span>
-</a>
-
+      <a class="btn btn-primary" href="https://www.patreon.com/cw/Gaminute" target="_blank" rel="noopener noreferrer">Join the Lab — $3/mo</a>
+      <a class="btn btn-ghost" href="#lab">What you get</a>
     </div>
   </div>
 </section>
 
+<!-- ============ INSIDE THE LAB (6) ============ -->
+<section id="lab">
+  <div class="container">
+    <h2 class="reveal">Inside the Lab</h2>
+<p class="lead center reveal" style="max-width:820px;margin:0 auto 32px;">
+Think of it as your favorite creator's Discord, but for mobile games. 
+No courses, no perfection, just real builds happening live. You play early, 
+suggest tiny tweaks, and watch what actually ships (and what flops). 
+It's a lab, not a lecture.
+</p>
+
+    <div class="grid-3">
+      <article class="card reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7v3.26A4 4 0 0 0 3 16a4 4 0 0 0 6 3.46V22h6v-2.54A4 4 0 0 0 21 16a4 4 0 0 0-2-3.47V9a7 7 0 0 0-7-7Z"/></svg>
+        <h3>Community Hub + Discord</h3>
+        <p>Patreon community for updates and feedback, plus optional Discord 
+          for live chat. Speak up or stay quiet—both totally cool.</p>
+      </article>
+
+      <article class="card reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7a2 2 0 0 0-2 2v14l7-3 7 3V5a2 2 0 0 0-2-2Z"/></svg>
+        <h3>Beta Access</h3>
+        <p>Download and try prototypes before Google Play. Minute-long runs, instant fun, direct feedback loop.</p>
+      </article>
+
+      <article class="card reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h14v2H5zm0 6h14v2H5zm0 6h9v2H5z"/></svg>
+        <h3>Regular updates</h3>
+        <p>What worked, what crashed, what I learned. Quick reads—no inspirational quotes, just "here's why I changed that button color."</p>
+      </article>
+
+      <article class="card reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>
+        <h3>Curated Tech Picks</h3>
+        <p>3–5 quality links (gamedev, AI, mobile UX) with 60-second takeaways and a tiny "try this" task.</p>
+      </article>
+
+      <article class="card reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10H20A8 8 0 1 1 12 4V2zm1 5h-2v6l5 3 .9-1.45-3.9-2.3V7z"/></svg>
+        <h3>Friendly Competitions</h3>
+        <p>Friendly score sprints and small badges across prototypes and releases. Pure skill, no pay-to-win.</p>
+      </article>
+
+      <article class="card reveal">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+        <h3>Ship &amp; Store Lab</h3>
+        <p>Icons, screenshots, listings and tiny marketing experiments—see what actually converts and why.</p>
+      </article>
+    </div>
+
+    <div class="lab-footer center reveal">
+      <div class="meta">
+        <span>
+          <svg style="width:20px;height:20px;color:var(--cyan);" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          All benefits
+        </span>
+        <span>Join Lab community</span>
+        <span>$3 / month</span>
+      </div>
+      <a class="btn btn-primary" href="#pricing">See full details</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS IN THE LAB ============ -->
+<section id="how">
+  <div class="container">
+    <h2 class="reveal">How it works in the Lab</h2>
+    <p class="lead center reveal" style="max-width:800px;margin:0 auto 48px;">
+      Six simple steps from joining to shipping. No complexity, no gatekeeping—just a transparent loop you can follow (or ignore) at your own pace.
+    </p>
+
+    <div class="timeline">
+      <div class="step reveal">
+        <div class="step-card">
+          <h3>1. Join</h3>
+          <p>Get Discord access, your welcome checklist, and the latest APKs. No setup headaches, no complicated onboarding.</p>
+        </div>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-card">
+          <h3>2. Play</h3>
+          <p>Run a round (≈60 seconds). If you spot something weird, drop a one-line note or a short clip. Or don't—just enjoy.</p>
+        </div>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-card">
+          <h3>3. Shape</h3>
+          <p>Weekly micro-votes decide tiny features (color, timing, one small mechanic). Winning options ship fast—or I'll explain why not.</p>
+        </div>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-card">
+          <h3>4. Ship</h3>
+          <p>Builds go to Google Play. You see the changelog and what changed because of Lab feedback. Your input, visible in the wild.</p>
+        </div>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-card">
+          <h3>5. Reflect</h3>
+          <p>Weekly Dev Notes: decisions, metrics, mistakes and fixes. Short, honest, and useful—so you learn the "why" behind every move.</p>
+        </div>
+      </div>
+
+      <div class="step reveal">
+        <div class="step-card">
+          <h3>6. Celebrate</h3>
+          <p>Season leaderboards, little badges and your name in credits on new releases. Small wins, public recognition.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="center reveal">
+      <span class="no-pressure">No-pressure mode: You don't have to chat, vote or comment. Many members simply play early and quietly follow the Lab's progress.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHO IT'S FOR ============ -->
+<section id="who">
+  <div class="container">
+    <h2 class="reveal">Who the Lab is for</h2>
+    <p class="lead center reveal" style="max-width:860px;margin:0 auto 32px;">
+      Find your lane—whether you want to play, learn, vibe code with AI, observe quietly, or ship tiny things together.
+    </p>
+
+    <div class="personas">
+      <article class="persona reveal">
+        <div class="p-title">
+          <svg class="p-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4h10v2H7zM4 8h16v2H4zm3 4h10v2H7zm-3 4h16v2H4z"/></svg>
+          Arcade Players
+        </div>
+        <p>Play early, survive 60-second runs, and race global seasons before everyone else. Pure skill, pure fun.</p>
+      </article>
+
+      <article class="persona reveal">
+        <div class="p-title">
+          <svg class="p-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v2H4zm0 5h10v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>
+          Hobby Developers
+        </div>
+        <p>See real trade-offs, steal tiny patterns, and watch decisions play out in actual shipped games.</p>
+      </article>
+
+      <article class="persona reveal">
+        <div class="p-title">
+          <svg class="p-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l8 4v6c0 5-3 8-8 8s-8-3-8-8V7l8-4z"/></svg>
+          Beginners Learning Code
+        </div>
+        <p>Safe place to observe and try small tasks. Learn by seeing real things ship, not just tutorials.</p>
+      </article>
+
+      <article class="persona reveal">
+        <div class="p-title">
+          <svg class="p-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3zm2 4h14v2H5zm-2 4h18v2H3z"/></svg>
+          AI Builders &amp; Vibe Coders
+        </div>
+        <p>Where AI genuinely helps (and fails) in tiny mobile games—prompts, pitfalls, outcomes, real workflows.</p>
+      </article>
+
+      <article class="persona reveal">
+        <div class="p-title">
+          <svg class="p-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M2 12h4l3 7 4-14 3 7h6"/></svg>
+          QA &amp; Testers
+        </div>
+        <p>Find bugs in live APKs, see triage → fix → retest, and get credited for helpful reports.</p>
+      </article>
+
+      <article class="persona reveal">
+        <div class="p-title">
+          <svg class="p-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10H20A8 8 0 1 1 12 4V2z"/></svg>
+          Quiet Lurkers
+        </div>
+        <p>Join, grab APKs, read updates, never type a word. You are welcome. We appreciate you. </p>
+      </article>
+    </div>
+
+    <!-- Social proof -->
+    <div class="quotes">
+<figure class="quote reveal">
+  <p>"I've been looking for a space where someone ships small games 
+  in public without the usual hype. Gaminute could be exactly that."</p>
+  <small>Alex — Hobby dev exploring ideas</small>
+</figure>
+
+<figure class="quote reveal">
+  <p>"Want to try game dev but hate long tutorials. 
+  A live lab with real decisions? Yeah, I'd join that."</p>
+  <small>Sam — Learning to code on weekends</small>
+</figure>
+
+<figure class="quote reveal">
+  <p>"Been searching for casual Android games that respect my time. 
+  60-second runs + early access? Count me in."</p>
+  <small>Maria — Mobile gamer, busy parent</small>
+</figure>
+
+<figure class="quote reveal">
+  <p>"Curious how AI actually fits into tiny mobile games. 
+  Would love to see the honest wins and fails."</p>
+  <small>Paul — Experimenting with ChatGPT</small>
+</figure>
+
+
+    </div>
+
+    <div class="social-proof-meta center reveal">
+      <p>
+        <svg style="display:inline;width:20px;height:20px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7v3.26A4 4 0 0 0 3 16a4 4 0 0 0 6 3.46V22h6v-2.54A4 4 0 0 0 21 16a4 4 0 0 0-2-3.47V9a7 7 0 0 0-7-7Z"/></svg>
+        Join Lab Members building in public
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing">
+  <div class="container">
+    <h2 class="reveal">Pricing — Lab Membership</h2>
+    <p class="lead center reveal" style="max-width:760px;margin:0 auto 28px;">
+      Just $3/month to keep a solo dev caffeinated and shipping tiny games in public. You get everything—early builds, backstage notes, and a calm Discord. Games stay free for everyone.
+    </p>
+
+    <div class="pricing-wrap">
+      <article class="pricing-card reveal">
+        <div class="eyebrow">Lab Membership</div>
+        <div class="price">$3 / month</div>
+<ul aria-label="All benefits included">
+  <li>Early builds you can actually play (before the world sees them)</li>
+  <li>Honest dev updates — what worked, what crashed, and why</li>
+  <li>Calm Discord where lurking is totally valid</li>
+  <li>Weekly tech picks (AI, gamedev, UX, marketing) you'll actually read</li>
+  <li>Friendly score sprints with tiny badges (pure skill, no pay-to-win)</li>
+  <li>Behind-the-scenes of launches, ads, and Google Play drama</li>
+  <li>Your name in game credits</li>
+  <li>Proof that $3 can fund indie experiments</li>
+</ul>
+
+        <div class="actions" style="margin-top:22px;">
+          <a class="btn btn-primary" href="https://www.patreon.com/cw/Gaminute" target="_blank" rel="noopener noreferrer">Join the Lab — $3/mo</a>
+        </div>
+
+        <div class="trust-grid">
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+            Cancel anytime
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+            Games stay free
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+            Android Games
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GAMES ============ -->
 <section id="games">
   <div class="container">
-    <h2>Games — coming soon</h2>
-    <div class="teaser-grid">
-      <article class="teaser-card">
-        <div class="teaser-thumb"><img src="galaxikowebimg.webp" alt="Upcoming project teaser" loading="lazy"></div>
-        <h3>Project 1</h3>
-        <p class="teaser-copy">Quick to start, satisfying to improve. Designed for one-hand play and short breaks.</p>
+    <h2 class="reveal">Games — coming soon</h2>
+    <p class="lead center reveal" style="max-width:800px;margin:0 auto 10px;">
+      A growing portfolio of tiny arcade experiments. Designed for one-hand play, short breaks and fair challenge. No pay-to-win, no forced videos.
+    </p>
+    <p class="games-note reveal">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      Lab Members play early builds before Google Play launch
+    </p>
+
+    <div class="games-grid">
+      <article class="game-card reveal">
+        <div class="game-thumb">
+          <img src="galaxikowebimg.webp" alt="Galaxiko prototype" loading="lazy" decoding="async">
+          <div class="badges">
+            <span class="badge">Prototype</span>
+            <span class="badge">Arcade</span>
+          </div>
+        </div>
+        <div class="game-body">
+          <div class="game-title">Galaxiko</div>
+          <div class="game-copy">Rhythm-based lane dodger. Survive 60 seconds, unlock harder modes, compete globally.</div>
+        </div>
       </article>
-      <article class="teaser-card">
-        <div class="teaser-thumb"><img src="loadingwebimg.webp" alt="Upcoming project teaser" loading="lazy"></div>
-        <h3>Project 2</h3>
-        <p class="teaser-copy">Clear feedback, fast restarts, clean UI. Focused fun without friction.</p>
+
+      <article class="game-card reveal">
+        <div class="game-thumb">
+          <img src="loadingwebimg.webp" alt="Loading Rush prototype" loading="lazy" decoding="async">
+          <div class="badges">
+            <span class="badge">In development</span>
+            <span class="badge">One-tap</span>
+          </div>
+        </div>
+        <div class="game-body">
+          <div class="game-title">Loading Rush</div>
+          <div class="game-copy">One-tap timing core with readable feedback, instant restarts, and pure flow state.</div>
+        </div>
       </article>
-      <article class="teaser-card">
-        <div class="teaser-thumb"><img src="lavawebimg.webp" alt="Upcoming project teaser" loading="lazy"></div>
-        <h3>Project 3</h3>
-        <p class="teaser-copy">Easy to learn, hard to master. Built for fair challenge and replayability.</p>
+
+      <article class="game-card reveal">
+        <div class="game-thumb">
+          <img src="lavawebimg.webp" alt="Lava Runner prototype" loading="lazy" decoding="async">
+          <div class="badges">
+            <span class="badge">Arcade</span>
+            <span class="badge">Replayable</span>
+          </div>
+        </div>
+        <div class="game-body">
+          <div class="game-title">Lava Runner</div>
+          <div class="game-copy">Easy to learn, hard to master. Built for fair challenge and that "one more try" feeling.</div>
+        </div>
       </article>
     </div>
   </div>
 </section>
 
+<!-- ============ ABOUT ============ -->
 <section id="about">
   <div class="container">
-    <!-- Hlavní nadpis stejné úrovně jako Games/Patreon/Contact -->
-    <h2>About Creator</h2>
+    <h2 class="reveal">About the creator</h2>
 
-    <div class="about-grid">
-      <!-- FOTO vlevo (desktop) / nahoře (mobil) -->
-      <figure class="about-photo">
-        <img src="Jiri.webp" alt="Jiri — Gaminute">
+    <div class="about">
+      <figure class="photo reveal">
+        <img src="Jiri.webp" alt="Jiri Silbersky — Gaminute creator" loading="lazy" decoding="async">
       </figure>
 
-      <!-- TEXT -->
-      <div class="about-copy">
-        <!-- 1) Úvodní odstavec -->
-        <p class="about-lead">
-          Hello, I’m Jiri, a software tester from the Czech Republic. I tried building simple apps,
-          but tiny mobile games grabbed me completely - one clean mechanic, tight timing,
-          and that “one more try” loop you can finish in seconds.
-        </p>
+      <div class="content reveal">
+       <p><strong>Hi, I'm Jiri. 👋</strong></p>
 
-        <!-- 2) Filozofie (stejný level, jako Project 1/2/3 v Games) -->
-        <h3 class="about-sub">Gaminute philosophy</h3>
-        <p>
-          My goal is clarity, quick retries, and fair challenge. I’m not a pro game developer;
-          I’m learning in public and building Gaminute in my free time.
-          Android only for now. I use rewarded ads only - no banners, no forced videos, no pop-ups.
-          After a run, you can watch a short ad for a small bonus. If you skip it, you keep playing.
-          The game flow stays clean.
-        </p>
+<p>Software tester from Prague. Amateur game dev at night. ChatGPT's best customer. 🤭 I started building my own games at night — tiny Android arcades that take 60 seconds to play.</p>
 
-        <!-- 3) Patreon (stejný level jako Project 1/2/3 v Games) -->
-        <h3 class="about-sub">Patreon dev diary</h3>
-        <p>
-          I keep a personal dev diary on Patreon — part build notes, part behind-the-scenes journal.
-          I share wins and mistakes, design decisions, backups, and why things change.
-          It’s not just features; it’s the whole Gaminute journey.
-        </p>
+<p>Here's the truth: <strong>I'm not a "real" game developer.</strong> I'm a hobbyist with ChatGPT, Stack Overflow, and way too much coffee. Gaminute is where I figure things out in public — the good builds, the broken ones, 
+and everything in between.</p>
 
-        <!-- CTA (stejné tlačítko jako v hero) -->
-        <div class="about-cta-center">
-          <a href="PATREON_URL?utm_source=site&utm_medium=about_cta"
-             class="btn btn--stack btn--patreon">
-            <span class="btn-label">Follow on Patreon</span>
-          </a>
+<p>This lab exists because I believe solo creators can ship real things without pretending to be perfect. ❤️ If that resonates, you're welcome here.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://www.patreon.com/cw/Gaminute" target="_blank" rel="noopener noreferrer">Join the Lab — $3/mo</a>
+          <a class="btn btn-ghost" href="#faq">Questions? Read FAQ</a>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ==================== PATREON SECTION (simple) ==================== -->
-<section id="patreon">
-  <div class="container">
-    <div class="intro">
-      <h2>Patreon</h2>
-      <p>I’m grateful for everyone who joins. Follow for free to read public notes. Support for $3 to play early and help decide small features. I’m an independent creator building everything myself.</p>
-    </div>
-
-    <h3 class="p-subtitle">What you get</h3>
-
-    <div class="p-table" role="region" aria-label="Patreon benefits">
-      <table>
-        <colgroup>
-          <col>
-          <col>
-          <col class="supporter">
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Benefit</th>
-            <th>Free Follower</th>
-            <th>Supporter $3</th>
-          </tr>
-        </thead>
-<tbody>
-  <tr>
-    <td><strong>Dev diary (public posts)</strong></td>
-    <td class="yes">✔</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>Open challenges</strong></td>
-    <td class="yes">✔</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>World record leaderboard</strong></td>
-    <td class="yes">✔</td>
-    <td class="yes">✔</td>
-  </tr>
-
-  <tr>
-    <td><strong>Roadmap &amp; open polls</strong></td>
-    <td class="yes">✔</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>Feature &amp; cosmetic votes</strong></td>
-    <td class="no">–</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>Work-in-progress notes</strong></td>
-    <td class="no">–</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>Bug Hall of Fame</strong></td>
-    <td class="no">–</td>
-    <td class="yes">✔</td>
-  </tr>
-
-  <tr>
-    <td><strong>Early playtest builds</strong></td>
-    <td class="no">–</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>Playtest brief</strong></td>
-    <td class="no">–</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>Supporter League</strong></td>
-    <td class="no">–</td>
-    <td class="yes">✔</td>
-  </tr>
-  <tr>
-    <td><strong>Thank you in credits</strong></td>
-    <td class="no">–</td>
-    <td class="yes">✔</td>
-  </tr>
-</tbody>
-
-      </table>
-    </div>
-
-    <div class="p-cta-center">
-<a href="PATREON_URL?utm_source=site&utm_medium=patreon_table_cta"
-   class="btn btn--stack btn--patreon">
-  <span class="btn-label">Follow on Patreon</span>
-</a>
-
-      <div class="p-note">Cancel anytime. No tiers to decode.</div>
-    </div>
-  </div>
-</section>
-<!-- ================== /PATREON SECTION (simple) ================== -->
-
-
+<!-- ============ FAQ ============ -->
 <section id="faq">
-  <div class="container">
-    <h2>FAQ</h2>
+  <div class="container" style="max-width:900px;">
+    <h2 class="reveal">FAQ</h2>
 
-    <details>
-      <summary>Which platforms are supported?</summary>
-      <div class="desc">
-        Android only for now. iOS may come later if there’s enough interest.
-        If you’d like to help me test across more devices, you can follow on Patreon (free) or support with $3.
-        <br><br>
-        <a href="PATREON_URL?utm_source=site&utm_medium=faq_platforms" style="color:var(--cyan);font-weight:700;">Follow on Patreon</a>
-      </div>
-    </details>
-
-        <details>
-      <summary>Why only Patreon (and not other socials)?</summary>
-      <div class="desc">
-        I keep everything in one quiet place so I can spend more time making games and less time juggling feeds.
-        Free followers get public posts and big-update alerts; supporters get early builds, private notes, and priority feedback.
-        <br><br>
-        <a href="PATREON_URL?utm_source=site&utm_medium=faq_why" style="color:var(--cyan);font-weight:700;">Follow on Patreon</a>
-      </div>
-    </details>
-
-    <details>
+    <details class="reveal">
       <summary>Are the games free?</summary>
-      <div class="desc">
-        Yes. Monetization is rewarded ads only. No banners, no forced videos, no pop-ups.
-        After a run you can optionally watch a short ad for a small bonus — you can always skip it and keep playing.
-      </div>
+      <div class="desc">Yes. Games stay free forever on Google Play. Monetization is optional rewarded ads after a run—skip anytime, no forced videos.</div>
     </details>
 
-    <details>
-      <summary>Do I need internet to play?</summary>
-      <div class="desc">
-        Core gameplay works offline. Internet is only needed for things like updates, optional rewarded ads, or future online features.
-      </div>
+    <details class="reveal">
+      <summary>What if I just want to play the games?</summary>
+      <div class="desc">Then just play! Games are free on Google Play forever. The Lab is for folks who want the "making-of documentary." Both paths = completely cool.</div>
     </details>
 
-    <details>
-      <summary>How can I report a bug or suggest an idea?</summary>
-      <div class="desc">
-        Comment or DM on Patreon, or email <a href="mailto:hello@gaminute.com" style="color:var(--cyan);font-weight:700;">hello@gaminute.com</a>.
-        Please include your device model, Android version, and a short description (a screenshot/video helps).
-      </div>
+    <details class="reveal">
+      <summary>Which platforms are supported?</summary>
+      <div class="desc">Android only for now. iOS might come later if there's enough interest and funding.</div>
     </details>
 
-    <details>
-      <summary>Do you track my data?</summary>
-      <div class="desc">
-        I try to keep things simple and private. I don’t collect personal data about you.
-        <br><br>
-        <strong>Website:</strong> only essential cookies for security/performance. No analytics, no tracking pixels.<br><br>
-        <strong>In-game:</strong> no analytics right now.<br><br>
-        <strong>Ads (rewarded only):</strong> the optional ad you can watch after a run is delivered by third-party ad networks (e.g., Google).
-        Depending on your Google/Android settings, ads may be personalized. I don’t get your personal data — I only see aggregate reports (like views and earnings).
-        You can manage ad personalization in your Google account or Android settings.<br><br>
-        <strong>Store:</strong> installs, purchases, and payments go through Google Play with its own privacy terms.
-        <br>
-      </div>
+    <details class="reveal">
+      <summary>Do I have to chat or vote?</summary>
+      <div class="desc">God no. Honestly, most members just download APKs, read Monday updates, and ghost the Discord. That's 100% valid. You paid—you decide.</div>
     </details>
+    
+<details class="reveal">
+  <summary>How often will you post on the Gaminute Patreon and Discord?</summary>
+  <div class="desc">
+    Gaminute is a nights-and-weekends passion project. I share progress as often as I can — sometimes tiny tweaks, sometimes chunky builds. 
+    No corporate schedule and no empty promises — just steady, honest updates at a human pace. 
+    If you support on Patreon, you’ll get behind-the-scenes notes, WIP clips, and early builds when they’re ready. 
+    It’s just me here, and I care a lot about keeping the stream of updates lively and real.
+  </div>
+</details>
 
   </div>
 </section>
 
-
-
-<section id="contact">
-  <div class="container">
-    <h2>Contact</h2>
-
-    <div class="contact-wrap">
-      <div class="contact-card">
-        <div class="contact-head">
-          <a href="mailto:hello@gaminute.com" class="contact-mail">hello@gaminute.com</a>
-        </div>
-        <div class="contact-divider"></div>
-        <p class="contact-sub">See you on Patreon.</p>
-        <div class="contact-cta">
-          <a href="PATREON_URL?utm_source=site&utm_medium=contact_cta"
-             class="btn btn--stack btn--patreon">
-            <span class="btn-label">Follow on Patreon</span>
-          </a>
-        </div>
-      </div>
+<!-- ============ FOOTER CTA ============ -->
+<section class="footer-cta center">
+  <div class="container reveal">
+    <h2>Ready to join the Lab?</h2>
+    <p class="lead" style="max-width:760px;margin:12px auto 0;">
+      One-person lab. Evenings &amp; weekends. Honest, tiny, and replayable. No gatekeeping, no BS.
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary" href="https://www.patreon.com/cw/Gaminute">Join the Lab — $3/mo</a>
+      <a class="btn btn-ghost" href="mailto:hello@gaminute.com">hello@gaminute.com</a>
     </div>
   </div>
 </section>
 
-
-
-<section id="final-slogan">
-  <h2><span class="red">Ga</span>minute - I'm gaming it!</h2>
-</section>
-
+<!-- ============ FOOTER ============ -->
 <footer>
-  <div class="container" style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center;text-align:center">
-    <span>© <span id="year"></span> Gaminute · All rights reserved.</span>
-    <span style="opacity:.35">•</span>
-    <a href="/privacy.html" style="color:var(--text-dim)">Privacy</a>
-    <span style="opacity:.35">•</span>
-    <a href="/terms.html" style="color:var(--text-dim)">Terms</a>
-    <span style="opacity:.35">•</span>
-    <a href="mailto:support@gaminute.com" style="color:var(--text-dim)">Contact</a>
+  <div class="container">
+    <p>© <span id="year"></span> Gaminute · All rights reserved</p>
+    <p style="margin-top:8px;">
+      <a href="mailto:support@gaminute.com">support@gaminute.com</a> ·
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/terms.html">Terms</a>
+    </p>
   </div>
 </footer>
 
-
 <script>
-document.getElementById("year").textContent = new Date().getFullYear();
+// Year
+document.getElementById('year').textContent = new Date().getFullYear();
 
-// Hamburger menu
-const toggle = document.getElementById('menu-toggle');
-const desktopMenu = document.getElementById('nav-menu');
-const mobileMenu = document.getElementById('nav-menu-mobile');
-mobileMenu.innerHTML = desktopMenu.innerHTML;
-toggle.addEventListener('click', () => {toggle.classList.toggle('active');mobileMenu.classList.toggle('show');});
-mobileMenu.addEventListener('click', e => { if (e.target.tagName === 'A') { mobileMenu.classList.remove('show'); toggle.classList.remove('active'); }});
+// Mobile menu toggle (a11y)
+const burger = document.querySelector('.hamburger');
+const mobileNav = document.getElementById('mobile-nav');
+
+if (burger && mobileNav) {
+  const setNavState = (open) => {
+    mobileNav.classList.toggle('show', open);
+    burger.classList.toggle('active', open);
+    burger.setAttribute('aria-expanded', String(open));
+    mobileNav.setAttribute('aria-hidden', String(!open));
+    // inert = když je menu zavřené, prvky uvnitř nejsou fokusovatelné
+    if (!open) {
+      mobileNav.setAttribute('inert', '');
+      document.body.style.overflow = '';
+    } else {
+      mobileNav.removeAttribute('inert');
+      document.body.style.overflow = 'hidden';
+      // po otevření pošli fokus na první odkaz
+      const firstLink = mobileNav.querySelector('a');
+      if (firstLink) firstLink.focus();
+    }
+  };
+
+  burger.addEventListener('click', () => {
+    const isOpen = mobileNav.classList.contains('show');
+    setNavState(!isOpen);
+  });
+
+  // Close on link click
+  mobileNav.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => setNavState(false));
+  });
+}
 
 
-// Respect reduced motion
-const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-if(mq.matches){ stopScroll(); }
-</script>
+// Reveal on scroll
+const revealElements = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('show');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-<!-- Cookie banner (beze změn) -->
-<style>
-#cookie-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#111722;color:#e7edf4;
-border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;display:none}
-#cookie-banner p{margin:0 0 10px 0;color:#a6b4c2}
-#cookie-banner .row{display:flex;gap:10px;flex-wrap:wrap}
-#cookie-accept,#cookie-decline{border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
-#cookie-accept{background:#00c853;color:#08150a;font-weight:700}
-#cookie-decline{background:#2a2f3a;color:#e7edf4}
-@media(min-width:720px){#cookie-banner{left:auto;right:20px;max-width:520px}}
-</style>
-<div id="cookie-banner" role="dialog" aria-live="polite">
-  <p>We use only necessary cookies for security/performance. No analytics or tracking. See <a href="/privacy.html" style="color:#5ce1e6">Privacy</a>.</p>
-  <div class="row">
-    <button id="cookie-accept">OK</button>
-    <button id="cookie-decline">No, thanks</button>
-  </div>
-</div>
-<script>
-(function(){
-  const KEY='gaminute-cookie-consent';
-  const saved=localStorage.getItem(KEY);
-  const el=document.getElementById('cookie-banner');
-  if(!saved) el.style.display='block';
-  const close=v=>{localStorage.setItem(KEY,v); el.style.display='none';};
-  document.getElementById('cookie-accept').onclick=()=>close('accepted');
-  document.getElementById('cookie-decline').onclick=()=>close('declined');
-})();
+if ('IntersectionObserver' in window) {
+  revealElements.forEach(el => revealObserver.observe(el));
+} else {
+  revealElements.forEach(el => el.classList.add('show'));
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const href = this.getAttribute('href');
+    if (href === '#' || href === '#top') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    
+    const target = document.querySelector(href);
+    if (target) {
+      e.preventDefault();
+      const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h'));
+      const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    }
+  });
+});
 </script>
 
 </body>

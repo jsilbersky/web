@@ -4,64 +4,321 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Privacy Policy – Gaminute</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Fonts to match index.html -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800;900&family=Inter:wght@400;600;700&family=Orbitron:wght@800;900&display=swap" rel="stylesheet">
+
+<link rel="icon" href="/gaminute_logo.png" type="image/png" sizes="32x32">
+<link rel="shortcut icon" href="/gaminute_logo.png" type="image/png">
+<link rel="icon" href="/gaminute_logo.png" type="image/png" sizes="192x192">
+
 <style>
-:root{--red:#ff5757;--cyan:#5ce1e6;--bg:#0b0f14;--text:#e7edf4;--text-dim:#a6b4c2;}
+/* ====== VARIABLES (match index) ====== */
+:root{
+  --cyan:#00d4ff;
+  --pink:#ff3366;
+  --bg:#0a0e1a;
+  --surface:#141b2e;
+  --surface-2:#1a2333;
+  --text:#e8f0f7;
+  --dim:#8a9db5;
+  --success:#00ff88;
+
+  --container: 980px;
+  --radius: 16px;
+  --pad-section: clamp(60px, 8vw, 100px);
+  --gap: 24px;
+  --header-h: 72px;
+  --shadow: 0 10px 40px rgba(0,0,0,.4);
+}
+
+/* ====== RESET / BASE ====== */
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Rajdhani",sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--header-h) + 20px);}
+body{
+  font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* Layered backdrop like index */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:-2;
+  background:
+    radial-gradient(1400px 700px at 10% 0%, rgba(0,212,255,.12), transparent 65%),
+    radial-gradient(900px 600px at 90% 25%, rgba(255,51,102,.10), transparent 65%),
+    radial-gradient(1000px 700px at 50% 100%, rgba(0,212,255,.10), transparent 65%),
+    linear-gradient(180deg, #0a0e1a 0%, #0a0f1f 45%, #0a0e1a 100%);
+  pointer-events:none;
+}
+body::after{
+  content:"";
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  opacity:.07; mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.50'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
+
 a{color:var(--cyan);text-decoration:none}
-.container{max-width:900px;margin:0 auto;padding:40px 24px}
-h1{font-family:"Orbitron",sans-serif;color:var(--cyan);font-size:42px;margin:26px 0}
-h2{color:var(--red);font-family:"Orbitron",sans-serif;margin:24px 0 8px}
-p,li{color:var(--text-dim);font-size:18px}
-ul{margin-left:1.2rem}
-header{border-bottom:1px solid rgba(255,255,255,.1);background:#0b0f14cc;backdrop-filter:blur(8px)}
-.nav{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:12px 24px}
-.nav a{color:var(--text)}
-footer{border-top:1px solid rgba(255,255,255,.1);text-align:center;padding:24px 0 40px;color:var(--text-dim);font-size:15px;margin-top:50px}
-.sep{opacity:.35;margin:0 .4rem}
+a:hover{text-decoration:underline}
+.container{max-width:var(--container);margin-inline:auto;padding:0 24px}
+
+/* ====== HEADER (same spirit) ====== */
+header{
+  position:sticky; top:0; z-index:1000;
+  backdrop-filter: blur(12px);
+  background:rgba(10,14,26,.90);
+  border-bottom:1px solid rgba(255,255,255,.12);
+  height:var(--header-h);
+}
+.header-inner{
+  display:flex; align-items:center; justify-content:space-between;
+  height:100%; gap:24px;
+}
+.brand{
+  display:flex; align-items:center; gap:12px;
+  font-family:"Orbitron",sans-serif; font-weight:900; font-size:22px; letter-spacing:-.3px;
+  color:var(--text);
+}
+.brand img{height:28px;width:auto;filter: drop-shadow(0 0 8px rgba(0,0,0,.3));}
+.brand-word{display:inline-flex; gap:0; line-height:1;}
+.brand .ga{color: var(--pink);}
+.brand .minute{color: var(--cyan);}
+nav a{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 14px; border-radius:8px; font-weight:600; font-size:14px; color:var(--text);
+}
+nav a:hover{background:rgba(255,255,255,.06); color:var(--cyan); text-decoration:none}
+
+/* ====== PAGE ====== */
+main{padding-block:var(--pad-section)}
+h1,h2,h3{font-family:"Space Grotesk",sans-serif; font-weight:800; line-height:1.15;}
+h1{font-size: clamp(36px, 6vw, 56px); margin-bottom:10px;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--text) 50%, var(--pink) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip:text;}
+.meta{color:var(--dim); font-weight:700; margin-bottom:24px}
+.section{
+  background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-bottom: 18px;
+}
+h2{font-size: clamp(22px, 3.5vw, 28px); margin-bottom:8px}
+p,li{color:var(--text); opacity:.9; font-size:16px}
+ul{margin-left:1.1rem}
+.small{font-size:14px;color:var(--dim)}
+.kv{display:grid;grid-template-columns: 220px 1fr;gap:8px}
+.kv div:nth-child(odd){color:#b8e7ff;font-weight:700}
+
+/* ====== FOOTER ====== */
+footer{
+  border-top:1px solid rgba(255,255,255,.12);
+  text-align:center; padding:32px 0 50px; color:var(--dim); font-size:15px;
+}
+footer a{color:var(--dim)}
+footer a:hover{color:var(--cyan); text-decoration:none}
+
+@media (max-width:700px){
+  .kv{grid-template-columns: 1fr}
+}
 </style>
 </head>
 <body>
+
 <header>
-  <div class="nav">
-    <a href="/" class="brand" style="display:flex;align-items:center;gap:10px;font-family:Orbitron"><img src="/gaminute_logo.webp" alt="Gaminute" style="width:26px;height:26px">Gaminute</a>
-    <span class="sep">•</span><a href="/">Home</a>
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label="Gaminute — Home">
+      <img src="/gaminute_logo.png" alt="Gaminute hourglass logo">
+      <span class="brand-word"><span class="ga">Ga</span><span class="minute">minute</span></span>
+    </a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/terms.html">Terms</a>
+    </nav>
   </div>
 </header>
 
 <main class="container">
   <h1>Privacy Policy</h1>
-  <p>Last updated: <strong><script>document.write(new Date().toISOString().slice(0,10))</script></strong></p>
+  <div class="meta">
+    Effective date: <strong>10 November 2025</strong><br>
+    Last updated: <strong><span id="last-updated"></span></strong>
+  </div>
 
-  <h2>What we collect</h2>
-  <p>This website does not use analytics, advertising, or tracking cookies. We only process data that you willingly provide (for example when you email us).</p>
+  <p class="small section">
+    This Privacy Policy works together with our <a href="/terms.html">Terms of Use</a>.
+    Gaminute is a solo, part-time project. We minimise data and only process what’s needed to run the site and deliver Lab benefits.
+  </p>
 
-  <h2>Cookies</h2>
-  <p>We use only strictly necessary cookies (if any) for security and performance of the site. No profiling or marketing cookies are used.</p>
+  <section class="section">
+    <h2>Who we are (data controller)</h2>
+    <div class="kv" aria-label="Controller details">
+      <div>Controller</div><div>Gaminute (solo creator project)</div>
+      <div>Contact</div><div><a href="mailto:support@gaminute.com">support@gaminute.com</a></div>
+      <div>Registered country</div><div>Czech Republic (EU)</div>
+      <div>Purpose of this site</div><div>Informational website about tiny Android games and the Gaminute “Lab” community.</div>
+    </div>
+    <p class="small" style="margin-top:10px">
+      <strong>Patreon relationship.</strong> When you support Gaminute via Patreon, Patreon acts as the
+      <strong>data controller</strong> for payment processing and platform services. We receive limited Patron Data
+      (e.g., display name, tier, join status, and where available, email) from Patreon to deliver Lab benefits
+      (early builds, Discord access, credits). For this purpose, we act as a <strong>data processor</strong> under
+      Patreon’s Data Processing Agreement. For our website, emails with you, and Discord moderation we act as a
+      <strong>data controller</strong>.
+    </p>
+  </section>
 
-  <h2>Emails</h2>
-  <p>If you contact us at <a href="mailto:support@gaminute.com">support@gaminute.com</a>, we will use your email address solely to respond to your inquiry.</p>
+  <section class="section">
+    <h2>What data we process</h2>
+    <ul>
+      <li><strong>Basic technical data</strong> (IP address, user agent) captured by our hosting for security and delivery (short-lived logs).</li>
+      <li><strong>Emails</strong> you send to us (address, message, metadata) to respond and keep a record of communications.</li>
+      <li><strong>Membership info from Patreon</strong> (display name, tier, join status) to deliver Lab benefits.</li>
+      <li><strong>Discord handles/messages</strong> if you join our Discord. Discord is a separate service with its own policy.</li>
+      <li><strong>Beta playtesting</strong> (optional): crash logs or feedback you voluntarily send us.</li>
+      <li><strong>Fonts</strong>: pages load web fonts; if served from a third-party CDN your IP is sent to that provider to deliver the files.</li>
+      <li>We do <strong>not</strong> knowingly collect special category data.</li>
+    </ul>
+  </section>
 
-  <h2>Your rights</h2>
-  <ul>
-    <li>Access, rectification, deletion of your personal data</li>
-    <li>Objection or restriction where applicable</li>
-  </ul>
-  <p>To exercise your rights, email <a href="mailto:support@gaminute.com">support@gaminute.com</a>.</p>
+  <section class="section">
+    <h2>Purposes & legal bases (GDPR)</h2>
+    <ul>
+      <li><strong>Run the site & security</strong> – legitimate interests (Art. 6(1)(f)).
+        <em>Our interest:</em> operate a functional, secure website.
+        <em>Impact:</em> minimal; only basic technical data stored briefly.</li>
+      <li><strong>Reply to emails</strong> – legitimate interests (communication) or pre-contract steps (Art. 6(1)(b)).</li>
+      <li><strong>Provide Lab benefits to Patrons</strong> – contract performance (Art. 6(1)(b)).</li>
+      <li><strong>Moderate Discord / community</strong> – legitimate interests (healthy community) (Art. 6(1)(f)).
+        <em>Impact:</em> public messages may be reviewed; moderation actions if rules are violated.</li>
+      <li><strong>Comply with law</strong> (e.g., accounting) – legal obligation (Art. 6(1)(c)).</li>
+      <li><strong>Consent</strong> – only where we explicitly ask for it (Art. 6(1)(a)).</li>
+    </ul>
+  </section>
 
-  <h2>Changes</h2>
-  <p>We may update this policy when we change how the site works. We will post any changes on this page.</p>
+  <section class="section">
+    <h2>Security & data breaches</h2>
+    <p>We use reasonable technical and organisational measures (encrypted connections, access controls, secure hosting). No system is 100% secure.</p>
+    <p>If a breach occurs that is likely to pose a risk to your rights and freedoms, we will notify the supervisory authority and, where required, affected individuals in line with GDPR Articles 33–34.</p>
+  </section>
+
+  <section class="section">
+    <h2>Retention</h2>
+    <ul>
+      <li><strong>Server logs:</strong> typically ≤ 30 days unless investigating abuse.</li>
+      <li><strong>Emails/support:</strong> up to 24 months after last interaction.</li>
+      <li><strong>Patron membership data:</strong> while membership is active + up to 3 years for records we must keep.</li>
+      <li><strong>Playtest reports/crash notes:</strong> up to 12 months (aggregated learnings may persist without personal data).</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Sharing & recipients</h2>
+    <ul>
+      <li><strong>Patreon</strong> – membership, billing, messaging. They are controller for their platform; we process Patron Data under their DPA to deliver benefits.</li>
+      <li><strong>Discord</strong> – if you join our server, your data is processed by Discord.</li>
+      <li><strong>Email/hosting providers</strong> – to deliver mail and host this site.</li>
+      <li><strong>Web font providers/CDNs</strong> – if fonts load from a CDN, your IP will reach that CDN.</li>
+      <li>We don’t sell your personal data. We share only what’s necessary to run the Lab and the site.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>International transfers</h2>
+    <p>Your data may be transferred outside the EEA when using services like Patreon or Discord. Where applicable, we rely on the EU Commission’s Standard Contractual Clauses (SCCs) or adequacy decisions to safeguard the transfer.</p>
+  </section>
+
+  <section class="section">
+    <h2>Cookies & similar tech</h2>
+    <p>We aim to minimise cookies. This site does not use analytics or marketing cookies. Essential cookies (if any) are used only to run the site.</p>
+  </section>
+
+  <section class="section">
+    <h2>Analytics & tracking</h2>
+    <p>We currently do <strong>not</strong> use analytics services. If we introduce privacy-friendly analytics (e.g., Plausible or self-hosted Matomo), we will update this policy and (where appropriate) provide an opt-out.</p>
+  </section>
+
+  <section class="section">
+    <h2>Web fonts</h2>
+    <p>Pages load web fonts. If they are served from a third-party CDN, your IP may be transmitted to deliver the files (legal basis: legitimate interest — readability/UX). We are evaluating self-hosting to remove external requests.</p>
+  </section>
+
+  <section class="section">
+    <h2>Automated decisions</h2>
+    <p>We do <strong>not</strong> make decisions based solely on automated processing (including profiling) that produce legal or similarly significant effects.</p>
+  </section>
+
+  <section class="section">
+    <h2>Your rights</h2>
+    <ul>
+      <li>Access your data and get a copy</li>
+      <li>Rectify inaccurate data</li>
+      <li>Erase data (“right to be forgotten”) where applicable</li>
+      <li>Restrict processing in certain cases</li>
+      <li>Data portability</li>
+      <li>Object to processing based on legitimate interests</li>
+      <li>Not be subject to decisions based solely on automated processing, including profiling, that produce legal or similarly significant effects</li>
+    </ul>
+    <p>To exercise a right, email <a href="mailto:support@gaminute.com">support@gaminute.com</a>. We may need to verify your identity.</p>
+  </section>
+
+  <section class="section">
+    <h2>Supervisory authority (Czech Republic)</h2>
+    <p>If you are in the EU/EEA, you can lodge a complaint with a supervisory authority. In the Czech Republic:</p>
+    <div class="kv" style="margin-top:8px">
+      <div>Úřad pro ochranu osobních údajů</div><div>Pplk. Sochora 27, 170 00 Praha 7</div>
+      <div>Website</div><div><a href="https://uoou.gov.cz/" target="_blank" rel="noopener">uoou.gov.cz</a></div>
+      <div>Info line</div><div>+420 234 665 800 (Tu/Thu 13:00–15:30)</div>
+      <div>Email</div><div><a href="mailto:posta@uoou.gov.cz">posta@uoou.gov.cz</a></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Children</h2>
+    <p>Gaminute is for general audiences and not directed to children. For online services in the Czech Republic, a child may consent to data processing from <strong>age 15</strong>. If you are under that age, please ask a parent/guardian to contact us on your behalf.</p>
+  </section>
+
+  <section class="section">
+    <h2>Changes</h2>
+    <p>We may update this notice when our services or providers change. We will post updates on this page and refresh the “Last updated” date.</p>
+  </section>
+
+  <section class="section">
+    <h2>Contact</h2>
+    <p>Questions or requests: <a href="mailto:support@gaminute.com">support@gaminute.com</a></p>
+  </section>
+
+  <section class="section">
+    <h2>Change log</h2>
+    <ul>
+      <li><strong>v1.0</strong> (10 Nov 2025): Initial public version.</li>
+    </ul>
+  </section>
 </main>
 
 <footer>
-  <div class="container" style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:center">
-    <span>© <span id="year"></span> Gaminute</span>
-    <span class="sep">•</span><a href="/privacy.html" style="color:var(--text-dim)">Privacy</a>
-    <span class="sep">•</span><a href="/terms.html" style="color:var(--text-dim)">Terms</a>
-    <span class="sep">•</span><a href="mailto:support@gaminute.com" style="color:var(--text-dim)">Contact</a>
+  <div class="container">
+    <p>© <span id="year"></span> Gaminute · All rights reserved</p>
+    <p style="margin-top:8px;">
+      <a href="/privacy.html">Privacy</a> ·
+      <a href="/terms.html">Terms</a> ·
+      <a href="mailto:support@gaminute.com">Contact</a>
+    </p>
   </div>
 </footer>
-<script>document.getElementById('year').textContent=new Date().getFullYear()</script>
+
+<script>
+  // dates
+  document.getElementById('year').textContent = new Date().getFullYear();
+  const d = new Date();
+  const iso = d.toLocaleDateString('en-GB',{year:'numeric', month:'long', day:'2-digit'});
+  document.getElementById('last-updated').textContent = iso;
+</script>
 </body>
 </html>
