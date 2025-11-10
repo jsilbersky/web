@@ -1217,22 +1217,33 @@ if ('IntersectionObserver' in window) {
 
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function(e) {
+  anchor.addEventListener('click', function (e) {
     const href = this.getAttribute('href');
-    if (href === '#' || href === '#top') {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-    const target = document.querySelector(href);
-    if (target) {
-      e.preventDefault();
-      const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h'));
-      const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
-      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    const isTop = href === '#' || href === '#top';
+    const target = isTop ? document.body : document.querySelector(href);
+    if (!target) return;
+
+    e.preventDefault();
+
+    const doScroll = () => {
+      const headerHeight =
+        parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 72;
+      const y = isTop ? 0 : target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 20;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    };
+
+    const mobileOpen = document.getElementById('mobile-panel')?.getAttribute('aria-hidden') === 'false';
+
+    if (mobileOpen) {
+      // pokud je panel otevřený, zavři ho a po animaci skroluj
+      if (typeof closeNav === 'function') closeNav();
+      setTimeout(doScroll, 260); // animace panelu má 250 ms
+    } else {
+      doScroll();
     }
   });
 });
+
 </script>
 
 
