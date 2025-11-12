@@ -153,7 +153,7 @@ scroll-margin-top: calc(var(--header-h) + 20px);}
 
 /* ========= HEADER ========= */
 header{
-  position:sticky; top:0; z-index:1000;
+  position:sticky; top:0; z-index:2000;
   backdrop-filter: blur(12px);
   background:rgba(10,14,26,.90);
   border-bottom:1px solid rgba(255,255,255,.12);
@@ -709,10 +709,11 @@ body.nav-open {
 </button>
 
 
-    <nav aria-label="Main navigation">
+    <nav id="desktop-nav" aria-label="Main navigation">
       <a href="#lab">Lab</a>
       <a href="#pricing">Pricing</a>
       <a href="#games">Games</a>
+      <a href="#about">About</a>
       <a href="#faq">FAQ</a>
       <a class="btn btn-primary"
    href="https://www.patreon.com/cw/Gaminute?utm_source=site&utm_medium=mobile_nav">
@@ -1182,6 +1183,18 @@ document.getElementById('year').textContent = new Date().getFullYear();
 const burger = document.querySelector('.hamburger');
 const panel  = document.getElementById('mobile-panel');
 const sheet  = panel?.querySelector('.mobile-panel__sheet');
+// === SYNC desktop -> mobile ===
+const desktopNav = document.getElementById('desktop-nav');
+if (desktopNav && sheet) {
+  // Přepíšeme obsah mobilního panelu aktuálními položkami včetně tlačítka
+  sheet.innerHTML = desktopNav.innerHTML;
+
+  // Každému odkazu v mobilním panelu přidáme data-close, aby se po kliku panel zavřel
+  sheet.querySelectorAll('a, button').forEach(el => {
+    el.setAttribute('data-close', '');
+  });
+}
+
 
 if (burger && panel && sheet) {
   let lastFocused = null;
