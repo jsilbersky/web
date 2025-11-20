@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | Gaminute</title>
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --brand-pink: #ff2e63; 
+            --brand-blue: #08d9d6; 
+            --bg-color: #0b0e14;
+            --text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- BACKGROUND --- */
+        .bg-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            /* Jemná záře na pozadí */
+            background: radial-gradient(circle at center, rgba(11, 14, 20, 0) 0%, rgba(11, 14, 20, 1) 100%);
+            z-index: -1;
+        }
+        
+        /* Mřížka pro tech feel */
+        .grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 700px;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- LOGO --- */
+        .logo-img {
+            max-width: 220px;
+            width: 100%;
+            height: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- GLITCH 404 --- */
+        .glitch-container {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        h1.glitch {
+            font-size: 9rem;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--text-color);
+            position: relative;
+            letter-spacing: -5px;
+            text-shadow: 4px 4px 0px rgba(255, 46, 99, 0.2);
+        }
+
+        h1.glitch::before, h1.glitch::after {
+            content: '404';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color); 
+        }
+
+        h1.glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--brand-pink);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-1 3s infinite linear alternate-reverse;
+        }
+
+        h1.glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--brand-blue);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim-2 2.5s infinite linear alternate-reverse;
+        }
+
+        /* --- TEXT CONTENT --- */
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #ffffff; /* Solid white as requested */
+            font-weight: 800;
+        }
+
+        p {
+            color: #cccccc;
+            margin-bottom: 2.5rem;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        /* Stylování slova Gaminute v textu */
+        .brand-ga { color: var(--brand-pink); font-weight: bold; }
+        .brand-minute { color: var(--brand-blue); font-weight: bold; }
+
+        /* --- BUTTON --- */
+        .btn {
+            text-decoration: none;
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease-in-out;
+            
+            /* Default state: Gaminute Blue */
+            background-color: var(--brand-blue);
+            color: #0b0e14; /* Tmavý text pro lepší čitelnost na světlé modré */
+            box-shadow: 0 0 20px rgba(8, 217, 214, 0.4);
+            border: 2px solid var(--brand-blue);
+        }
+
+        .btn:hover {
+            /* Hover state: Gaminute Red/Pink */
+            background-color: var(--brand-pink);
+            color: #ffffff; /* Bílý text na červené */
+            box-shadow: 0 0 30px rgba(255, 46, 99, 0.6);
+            border-color: var(--brand-pink);
+            transform: translateY(-3px);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(20px, 9999px, 15px, 0); }
+            20% { clip: rect(60px, 9999px, 70px, 0); }
+            40% { clip: rect(20px, 9999px, 50px, 0); }
+            60% { clip: rect(10px, 9999px, 45px, 0); }
+            80% { clip: rect(50px, 9999px, 100px, 0); }
+            100% { clip: rect(90px, 9999px, 85px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(120px, 9999px, 125px, 0); }
+            20% { clip: rect(10px, 9999px, 5px, 0); }
+            40% { clip: rect(80px, 9999px, 100px, 0); }
+            60% { clip: rect(30px, 9999px, 40px, 0); }
+            80% { clip: rect(110px, 9999px, 130px, 0); }
+            100% { clip: rect(10px, 9999px, 80px, 0); }
+        }
+
+        /* --- RESPONZIVITA --- */
+        @media (max-width: 600px) {
+            h1.glitch { font-size: 6rem; }
+            h2 { font-size: 1.8rem; }
+            .btn { padding: 15px 30px; font-size: 0.9rem; }
+            .logo-img { max-width: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid"></div>
+    <div class="bg-glow"></div>
+
+    <div class="container">
+        <img src="gaminute_logo.png" alt="Gaminute Logo" class="logo-img">
+
+        <div class="glitch-container">
+            <h1 class="glitch" data-text="404">404</h1>
+        </div>
+
+        <h2>GAME OVER</h2>
+        
+        <p>
+            It looks like you've lost your way in the <span class="brand-ga">Ga</span><span class="brand-minute">minute</span> universe.
+            The level you are looking for doesn't exist or has been moved.
+        </p>
+
+        <a href="/" class="btn">Back to Home</a>
+    </div>
+
+</body>
+</html>
