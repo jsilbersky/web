@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ========== DATA (Místo databáze) ==========
-// Data jsou nyní "natvrdo" v kódu, aby se načetla bez SQLite
+// Data jsou nyní "natvrdo" v kódu. ID musíme dopsat ručně.
 const PORTFOLIO_GAMES = [
   {
     id: 1,
@@ -66,20 +66,20 @@ const PORTFOLIO_GAMES = [
 // ========== MIDDLEWARE ==========
 app.use(cors());
 app.use(express.json());
-// Servírování statických souborů (obrázky, css, html)
+// Servírování statických souborů z veřejné složky
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Request logging
+// Logování požadavků (pro debug)
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
-// ========== PUBLIC API ENDPOINTS ==========
+// ========== API ENDPOINTS ==========
 
 /**
  * GET /api/stats
- * Vrací statistiky (počítáno z pole PORTFOLIO_GAMES)
+ * Vrací statistiky vypočítané ze statického pole
  */
 app.get('/api/stats', (req, res) => {
   const stats = {
@@ -93,19 +93,19 @@ app.get('/api/stats', (req, res) => {
 
 /**
  * GET /api/games
- * Vrací všechny hry s možností filtrování
+ * Vrací hry s možností filtrování (simulace SQL WHERE)
  */
 app.get('/api/games', (req, res) => {
   const { search, genre, sort } = req.query;
   
   let results = [...PORTFOLIO_GAMES];
 
-  // Genre filter
+  // Filtr podle žánru
   if (genre && genre !== 'all') {
     results = results.filter(g => g.genre === genre);
   }
 
-  // Search filter
+  // Vyhledávání
   if (search) {
     const term = search.toLowerCase();
     results = results.filter(g => 
@@ -114,25 +114,26 @@ app.get('/api/games', (req, res) => {
     );
   }
 
-  // Sorting (jednoduchá implementace)
+  // Řazení
   if (sort === 'oldest') {
     results.sort((a, b) => a.id - b.id);
   } else if (sort === 'alpha') {
     results.sort((a, b) => a.title.localeCompare(b.title));
   } else {
-    // Default: Live first
+    // Default: Live první, pak podle vlastního pořadí
     const statusOrder = { 'Live': 0, 'In Dev': 1, 'Prototype': 2, 'Concept': 3 };
     results.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
   }
 
-  // Simulate delay
+  // Malé zpoždění pro efekt načítání (volitelné)
   setTimeout(() => {
     res.json(results);
-  }, 200);
+  }, 100);
 });
 
 /**
  * GET /api/games/:id
+ * Najde jednu hru podle ID
  */
 app.get('/api/games/:id', (req, res) => {
   const id = parseInt(req.params.id);
@@ -146,19 +147,18 @@ app.get('/api/games/:id', (req, res) => {
 
 /**
  * POST /api/contact
- * Přijme zprávu, ale jen ji vypíše do logu (neukládá do DB)
+ * Přijme zprávu, vypíše ji do konzole a vrátí úspěch (neukládá do DB)
  */
 app.post('/api/contact', (req, res) => {
   const { email, message } = req.body;
 
-  // Validation
   if (!email || !message) {
     return res.status(400).json({ error: 'Email and message are required' });
   }
 
-  console.log(`📧 FAKE EMAIL SENT: From ${email}, Msg: ${message}`);
+  // Jen vypíšeme do logu (na Vercelu uvidíte v záložce Logs)
+  console.log(`📧 FAKE CONTACT FORM: From ${email}, Msg: ${message}`);
   
-  // Vrátíme úspěch, aby frontend nehlásil chybu
   res.json({
     success: true,
     message: 'Message received (Simulation)',
@@ -172,7 +172,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', mode: 'static-no-db' });
 });
 
-// 404 handler
+// 404 handler - vrací index.html pro SPA (Single Page App) chování
 app.use((req, res) => {
   if (!req.path.startsWith('/api')) {
     res.sendFile(path.join(__dirname, '../public/index.html'));
@@ -181,12 +181,13 @@ app.use((req, res) => {
   }
 });
 
-// ========== SERVER START (Vercel Compatible) ==========
+// ========== SERVER START (Důležité pro Vercel!) ==========
 
-// Exportujeme aplikaci pro Vercel
+// 1. Exportujeme aplikaci, aby ji Vercel mohl spustit jako Serverless funkci
 module.exports = app;
 
-// Server spustíme pouze pokud běžíme lokálně (ne jako modul)
+// 2. Server spustíme na portu JENOM pokud běžíme lokálně u tebe na PC
+// (Vercel si to spouští sám interně, tento kód ignoruje)
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running in STATIC mode on http://localhost:${PORT}`);
