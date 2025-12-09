@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gaminute — Android Game Developer Portfolio</title>
+  <meta name="description" content="Solo Android game developer crafting arcade experiences. Download games on Google Play." />
+  <link rel="icon" type="image/png" href="img/gaminute_logo.png">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ========== STICKY HEADER ========== -->
+  <header id="main-header">
+    <div class="container header-inner">
+      <a href="#hero" class="brand">
+        <img src="img/gaminute_logo.png" alt="Gaminute logo">
+        <span class="brand-word"><span class="ga">Ga</span><span class="minute">minute</span></span>
+      </a>
+      
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav id="desktop-nav">
+        <a href="#hero" class="nav-link active">Home</a>
+        <a href="#games" class="nav-link">Games</a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="#contact" class="nav-link">Contact</a>
+        <a class="btn btn-primary" href="https://play.google.com/store/apps/developer?id=Gaminute" target="_blank" rel="noopener">Google Play</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========== MOBILE MENU ========== -->
+  <aside class="mobile-panel" id="mobile-panel" hidden>
+    <div class="mobile-panel__backdrop"></div>
+    <nav class="mobile-panel__sheet">
+      <a href="#hero" class="mobile-link">Home</a>
+      <a href="#games" class="mobile-link">Games</a>
+      <a href="#about" class="mobile-link">About</a>
+      <a href="#faq" class="mobile-link">FAQ</a>
+      <a href="#contact" class="mobile-link">Contact</a>
+      <a class="btn btn-primary" href="https://play.google.com/store/apps/developer?id=Gaminute" target="_blank" rel="noopener">Google Play</a>
+    </nav>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main id="app">
+
+    <!-- ===== SECTION 1: HERO ===== -->
+    <section id="hero" class="section hero-section">
+      <div class="container">
+        <div class="hero-content reveal">
+          <span class="kicker">Solo Android Game Developer</span>
+          <h1 class="hero-title">Crafting arcade<br>experiences that matter.</h1>
+          <p class="lead">
+            Small games, big polish. Building instant-fun Android titles with technical excellence and zero predatory mechanics.
+          </p>
+          
+          <div class="hero-actions">
+            <a href="#games" class="btn btn-primary">Explore Games</a>
+            <a href="https://play.google.com/store/apps/developer?id=Gaminute" target="_blank" rel="noopener" class="btn btn-ghost">Google Play</a>
+          </div>
+
+          <!-- Live Stats -->
+          <div class="stats-grid" id="stats-grid">
+            <div class="stat-card skeleton"></div>
+            <div class="stat-card skeleton"></div>
+            <div class="stat-card skeleton"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2: GAMES ===== -->
+    <section id="games" class="section games-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Game Portfolio</h2>
+          <p class="section-subtitle">From prototypes to published releases on Google Play</p>
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="controls-bar reveal">
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input 
+              type="text" 
+              id="search-input" 
+              class="search-input" 
+              placeholder="Search games..."
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="filter-chips" id="filter-chips">
+            <button class="chip active" data-genre="all">All</button>
+            <button class="chip" data-genre="arcade">Arcade</button>
+            <button class="chip" data-genre="puzzle">Puzzle</button>
+          </div>
+
+          <select id="status-select" class="sort-select">
+            <option value="all">All Status</option>
+            <option value="Live">Live</option>
+            <option value="In Dev">In Development</option>
+            <option value="Prototype">Prototype</option>
+            <option value="Concept">Concept</option>
+          </select>
+        </div>
+
+        <!-- Games Grid (2 columns) -->
+        <div class="games-grid" id="games-grid">
+          <!-- Loading skeletons -->
+          <div class="game-card skeleton"></div>
+          <div class="game-card skeleton"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state" hidden>
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          <h3>No games found</h3>
+          <p>Try adjusting your search or filters</p>
+          <button class="btn btn-ghost" id="reset-filters">Reset Filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 3: ABOUT ===== -->
+    <section id="about" class="section about-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>About the Developer</h2>
+          <p class="section-subtitle">Solo creator focused on quality over quantity</p>
+        </div>
+
+        <div class="about-content reveal">
+          <div class="about-card">
+            <div class="creator-profile">
+              <div class="creator-image-wrap">
+                <img src="img/Jiri.webp" alt="Jiri Silbersky" width="120" height="120">
+              </div>
+              <h3>Hi, I'm Jiri</h3>
+              <p class="creator-role">QA Engineer & Indie Game Developer</p>
+            </div>
+
+            <div class="about-text">
+              <p>
+                Gaminute is my personal project where I combine a passion for game design 
+                with technical rigor. Every game is built from the ground up with clean code, 
+                efficient architecture, and a focus on instant fun.
+              </p>
+              <p>
+                As a QA Engineer by trade, I bring professional testing standards to indie 
+                development. Each release is polished, performant, and built to respect your 
+                time—no dark patterns, no pay-to-win mechanics.
+              </p>
+            </div>
+          </div>
+
+          <div class="philosophy-grid">
+            <div class="philosophy-card reveal">
+              <div class="philosophy-icon">🕹️</div>
+              <h3>Pure Arcade Loops</h3>
+              <p>Quick, satisfying gameplay designed for short sessions and commutes.</p>
+            </div>
+
+            <div class="philosophy-card reveal">
+              <div class="philosophy-icon">💎</div>
+              <h3>Technical Quality</h3>
+              <p>Stable architecture, low latency, and efficient code in every release.</p>
+            </div>
+
+            <div class="philosophy-card reveal">
+              <div class="philosophy-icon">🤝</div>
+              <h3>Player Respect</h3>
+              <p>No forced ads, no paywalls. Earning your time, not your wallet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 4: FAQ ===== -->
+    <section id="faq" class="section faq-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Frequently Asked Questions</h2>
+          <p class="section-subtitle">Everything you need to know about Gaminute games</p>
+        </div>
+
+        <div class="faq-wrapper reveal">
+          <details class="faq-item">
+            <summary>Are your games really free?</summary>
+            <div class="faq-content">
+              <p>Yes! All games are free to download and play. I use ethical monetization—optional rewarded ads and one-time purchases, never pay-to-win mechanics or forced ads.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Why only Android?</summary>
+            <div class="faq-content">
+              <p>As a solo developer, I focus on one platform to ensure maximum quality. Android gives me the flexibility to iterate quickly and reach a wide audience without the constraints of other platforms.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>How often do you release new games?</summary>
+            <div class="faq-content">
+              <p>I prioritize quality over quantity. Expect 2-3 new games per year, with regular updates to existing titles based on player feedback.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Can I request features or report bugs?</summary>
+            <div class="faq-content">
+              <p>Absolutely! Use the contact form below or leave a review on Google Play. I read every message and actively implement community suggestions.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>Do you collect personal data?</summary>
+            <div class="faq-content">
+              <p>No. Games only collect anonymous analytics (crash reports, gameplay stats) to improve performance. No personal information is stored or sold. Check the <a href="privacy.html">Privacy Policy</a> for details.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary>What tech stack do you use?</summary>
+            <div class="faq-content">
+              <p>Games are built with native Android tools (Java/Kotlin), Canvas API for graphics, and SQLite for data persistence. The portfolio site runs on Node.js + Express + SQLite.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 5: CONTACT ===== -->
+    <section id="contact" class="section contact-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2>Get in Touch</h2>
+          <p class="section-subtitle">Found a bug? Have feedback? Let me know.</p>
+        </div>
+
+        <div class="contact-wrapper reveal">
+          <form id="contact-form" class="contact-form">
+            <div class="form-group">
+              <label for="email">Your Email</label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email"
+                class="form-input"
+                placeholder="name@example.com"
+                required
+                autocomplete="email"
+              >
+              <span class="form-error" id="email-error"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea 
+                id="message" 
+                name="message"
+                class="form-input"
+                rows="5"
+                placeholder="What's on your mind?"
+                required
+              ></textarea>
+              <span class="form-error" id="message-error"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit" id="submit-btn">
+              <span class="btn-text">Send Message</span>
+              <span class="btn-loader" hidden>
+                <svg class="spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.4 31.4" stroke-dashoffset="0"></circle></svg>
+                <span>Sending...</span>
+              </span>
+            </button>
+          </form>
+
+          <div class="contact-info">
+            <div class="info-card">
+              <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <h3>Location</h3>
+              <p>Prague, Czech Republic</p>
+            </div>
+
+            <div class="info-card">
+              <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+              </svg>
+              <h3>Platform</h3>
+              <p>Android Exclusive</p>
+            </div>
+
+            <div class="info-card">
+              <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/>
+              </svg>
+              <h3>Support</h3>
+              <p>Community-driven feedback</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== TOAST NOTIFICATIONS ========== -->
+  <div id="toast-container"></div>
+
+  <!-- ========== FOOTER ========== -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="img/gaminute_logo.png" alt="Gaminute" class="footer-logo">
+          <p class="footer-tagline">Solo Android Game Lab</p>
+        </div>
+        
+        <div class="footer-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Use</a>
+          <a href="https://play.google.com/store/apps/developer?id=Gaminute" target="_blank" rel="noopener">Google Play</a>
+        </div>
+        
+        <p class="footer-copy">© <span id="year"></span> Gaminute. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script src="js/main.js"></script>
+</body>
+</html>
