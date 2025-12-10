@@ -196,8 +196,7 @@ const Games = {
   async loadGames() {
     const games = await API.fetchGames();
     STATE.games = games;
-    STATE.filteredGames = games;
-    this.render();
+    this.applyFilters();
   },
 
   setupControls() {
