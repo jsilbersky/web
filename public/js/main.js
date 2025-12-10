@@ -11,8 +11,7 @@ const STATE = {
     search: '',
     genre: 'all',
     status: 'all'
-  },
-  expandedGameId: null
+  }
 };
 
 // ========== API CLIENT ==========
@@ -26,6 +25,7 @@ const API = {
       return await res.json();
     } catch (err) {
       console.error('API Error:', err);
+      // Fallback data
       return { totalGames: 4, liveGames: 1, inDev: 2 };
     }
   },
@@ -184,7 +184,7 @@ const Stats = {
   }
 };
 
-// ========== GAMES SECTION ==========
+// ========== GAMES SECTION (UPDATED) ==========
 const Games = {
   debounceTimer: null,
 
@@ -285,59 +285,10 @@ const Games = {
     }
 
     emptyState.hidden = true;
-    grid.style.display = 'grid';
+    grid.style.display = 'flex'; // Changed to flex for new layout
     
+    // Create HTML
     grid.innerHTML = STATE.filteredGames.map(game => this.createCard(game)).join('');
-
-    // Setup click handlers for expand/collapse
-    STATE.filteredGames.forEach(game => {
-      const moreBtn = document.getElementById(`more-btn-${game.id}`);
-      const downloadBtn = document.getElementById(`download-btn-${game.id}`);
-      
-      moreBtn?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.toggleDetail(game.id);
-      });
-    });
-  },
-
-  toggleDetail(gameId) {
-    const detail = document.getElementById(`detail-${gameId}`);
-    const moreBtn = document.getElementById(`more-btn-${gameId}`);
-    
-    if (!detail || !moreBtn) return;
-
-    const isExpanded = detail.classList.contains('expanded');
-    
-    // Close all other details
-    document.querySelectorAll('.game-detail').forEach(d => {
-      if (d.id !== `detail-${gameId}`) {
-        d.classList.remove('expanded');
-      }
-    });
-    
-    // Update all buttons
-    document.querySelectorAll('[id^="more-btn-"]').forEach(btn => {
-      if (btn.id !== `more-btn-${gameId}`) {
-        btn.textContent = 'More Info';
-      }
-    });
-
-    // Toggle current detail
-    if (isExpanded) {
-      detail.classList.remove('expanded');
-      moreBtn.textContent = 'More Info';
-      STATE.expandedGameId = null;
-    } else {
-      detail.classList.add('expanded');
-      moreBtn.textContent = 'Less Info';
-      STATE.expandedGameId = gameId;
-      
-      // Scroll to show the expanded content
-      setTimeout(() => {
-        detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
-    }
   },
 
   createCard(game) {
@@ -350,9 +301,14 @@ const Games = {
 
     const hasUrl = game.url && game.url.trim() !== '';
     
-    const downloadBtn = hasUrl 
-      ? `<a href="${game.url}" target="_blank" rel="noopener" class="btn btn-primary" id="download-btn-${game.id}">Google Play</a>`
-      : `<button class="btn btn-ghost" disabled style="opacity: .5; cursor: not-allowed;">Not Released</button>`;
+    // Button Logic: Live = CTA, Dev/Other = Static text/disabled
+    let actionBtn;
+    if (game.status === 'Live' && hasUrl) {
+        actionBtn = `<a href="${game.url}" target="_blank" rel="noopener" class="btn btn-primary">Get on Google Play</a>`;
+    } else {
+        // Just a status label button (not clickable)
+        actionBtn = `<button class="btn btn-static" disabled>${game.status === 'In Dev' ? 'In Development' : 'Concept Only'}</button>`;
+    }
 
     return `
       <article class="game-card" data-game-id="${game.id}">
@@ -363,34 +319,12 @@ const Games = {
             <span class="badge badge-genre">${game.genre}</span>
           </div>
         </div>
+        
         <div class="game-body">
           <h3 class="game-title">${game.title}</h3>
-          <div class="game-tech">
-            <span>${game.tech === 'canvas' ? '🎨 Canvas' : '📱 Native UI'}</span>
-            <span>•</span>
-            <span>v${game.version}</span>
-          </div>
-          <p class="game-desc">${game.description.substring(0, 120)}...</p>
-          
-          <div class="game-detail" id="detail-${game.id}">
-            <div class="game-detail-content">
-              <h4>Full Description</h4>
-              <p>${game.description}</p>
-              
-              <h4>Technical Details</h4>
-              <ul>
-                <li><strong>Technology:</strong> ${game.tech === 'canvas' ? 'HTML5 Canvas API' : 'Native DOM UI'}</li>
-                <li><strong>Version:</strong> ${game.version}</li>
-                <li><strong>Genre:</strong> ${game.genre.charAt(0).toUpperCase() + game.genre.slice(1)}</li>
-                <li><strong>Status:</strong> ${game.status}</li>
-                ${hasUrl ? `<li><strong>Download:</strong> <a href="${game.url}" target="_blank" rel="noopener">Google Play Store</a></li>` : ''}
-              </ul>
-            </div>
-          </div>
-
+          <p class="game-desc">${game.description}</p>
           <div class="game-actions">
-            ${downloadBtn}
-            <button class="btn btn-ghost" id="more-btn-${game.id}">More Info</button>
+            ${actionBtn}
           </div>
         </div>
       </article>
@@ -460,7 +394,6 @@ const ContactForm = {
   async handleSubmit(e) {
     e.preventDefault();
 
-    // Prevent double submission
     if (this.isSubmitting) return;
 
     const emailValid = this.validateEmail();
@@ -530,7 +463,6 @@ const Toast = {
 
     this.container.appendChild(toast);
 
-    // Auto remove after 4 seconds
     setTimeout(() => {
       toast.classList.add('removing');
       setTimeout(() => toast.remove(), 300);
@@ -573,20 +505,17 @@ const Utils = {
 
 // ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', async () => {
-  // Initialize all modules
   Utils.updateYear();
   Navigation.init();
   ContactForm.init();
   Toast.init();
   RevealOnScroll.init();
 
-  // Load data
   await Promise.all([
     Stats.load(),
     Games.init()
   ]);
 
-  // Trigger initial reveal animations
   setTimeout(() => {
     document.querySelectorAll('.hero-content .reveal').forEach(el => {
       el.classList.add('show');
@@ -594,7 +523,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }, 100);
 });
 
-// ========== EXPORT FOR TESTING ==========
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { API, STATE, Games, ContactForm, Toast };
 }

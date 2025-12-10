@@ -52,7 +52,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Simple noise texture overlay - no animated gradients */
+/* Simple noise texture overlay */
 body::after {
   content: "";
   position: fixed;
@@ -79,7 +79,7 @@ h2 {
 }
 
 h3 {
-  font-size: clamp(22px, 3vw, 28px);
+  font-size: clamp(28px, 3vw, 36px);
   font-weight: 700;
   color: var(--text);
 }
@@ -116,7 +116,7 @@ a {
 
 .section-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 80px;
 }
 
 .section-subtitle {
@@ -132,7 +132,7 @@ a {
   justify-content: center;
   gap: 8px;
   height: 56px;
-  padding: 0 28px;
+  padding: 0 32px;
   border-radius: 999px;
   font-weight: 700;
   font-size: 16px;
@@ -142,6 +142,7 @@ a {
   cursor: pointer;
   background: none;
   font-family: inherit;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -167,6 +168,15 @@ a {
   background: rgba(255,255,255,.08);
   border-color: rgba(255,255,255,.4);
   transform: translateY(-1px);
+}
+
+/* Disabled/Static Button State */
+.btn-static {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--dim);
+  cursor: default;
+  box-shadow: none;
 }
 
 .btn:disabled {
@@ -523,7 +533,7 @@ a {
   letter-spacing: 0.5px;
 }
 
-/* ========== GAMES SECTION ========== */
+/* ========== GAMES SECTION (OPEN LAYOUT) ========== */
 .games-section {
   background: var(--bg);
 }
@@ -532,7 +542,7 @@ a {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 16px;
-  margin-bottom: 40px;
+  margin-bottom: 80px;
   align-items: center;
 }
 
@@ -632,74 +642,64 @@ a {
   padding: 12px;
 }
 
-/* Games Grid - Full width rows */
+/* Games Grid - Flex Column for Zig-Zag */
 .games-grid {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 120px; /* Big space between games */
 }
 
 .game-card {
-  background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  border: 1px solid rgba(255,255,255,.2);
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  transition: opacity .3s var(--ease-smooth);
+}
+
+/* Even cards (2nd, 4th...) reverse order */
+.game-card:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+/* Image container with Glow */
+.game-thumb {
+  flex: 1.1;
+  aspect-ratio: 16/9;
+  position: relative;
   border-radius: 20px;
   overflow: hidden;
-  transition: all .3s var(--ease-smooth);
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 0;
-  align-items: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6); /* Deep shadow */
+  transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth);
 }
 
-.game-card:hover {
-  border-color: var(--cyan);
-  box-shadow: 0 10px 40px rgba(0,0,0,.6);
-  transform: translateY(-4px);
-}
-
-/* Alternate layout - odd cards (image left) */
-.game-card:nth-child(odd) {
-  grid-template-columns: 1fr 1.2fr;
-}
-
+/* Specific Glows based on Brand */
 .game-card:nth-child(odd) .game-thumb {
-  order: 1;
-}
-
-.game-card:nth-child(odd) .game-body {
-  order: 2;
-}
-
-/* Alternate layout - even cards (image right) */
-.game-card:nth-child(even) {
-  grid-template-columns: 1.2fr 1fr;
+  /* Cyan glow for odd */
+  box-shadow: 0 0 0 1px rgba(0,212,255,0.1), 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0,212,255,0.15);
 }
 
 .game-card:nth-child(even) .game-thumb {
-  order: 2;
+  /* Pink glow for even */
+  box-shadow: 0 0 0 1px rgba(255, 51, 102,0.1), 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255, 51, 102,0.15);
 }
 
-.game-card:nth-child(even) .game-body {
-  order: 1;
+.game-thumb:hover {
+  transform: scale(1.02);
 }
 
-.game-thumb {
-  aspect-ratio: 4/3;
-  overflow: hidden;
-  position: relative;
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 51, 102, 0.1));
-  height: 100%;
+.game-card:nth-child(odd) .game-thumb:hover {
+   box-shadow: 0 0 0 1px rgba(0,212,255,0.3), 0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(0,212,255,0.25);
+}
+
+.game-card:nth-child(even) .game-thumb:hover {
+   box-shadow: 0 0 0 1px rgba(255, 51, 102,0.3), 0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(255, 51, 102,0.25);
 }
 
 .game-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform .5s ease;
-}
-
-.game-card:hover .game-thumb img {
-  transform: scale(1.05);
+  display: block;
 }
 
 .game-badges {
@@ -709,6 +709,7 @@ a {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  z-index: 2;
 }
 
 .badge {
@@ -747,123 +748,36 @@ a {
 }
 
 .game-body {
-  padding: 32px;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .game-title {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 28px;
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: var(--text);
-}
-
-.game-tech {
-  display: flex;
-  gap: 12px;
-  font-size: 14px;
-  color: var(--dim);
-  margin-bottom: 16px;
-  font-weight: 600;
+  margin-bottom: 24px;
+  /* Font size is set in H3 helper but can be overridden here if needed */
 }
 
 .game-desc {
+  font-size: 18px;
+  line-height: 1.6;
   color: var(--dim);
-  font-size: 16px;
-  line-height: 1.65;
-  margin-bottom: 20px;
-  flex: 1;
+  margin-bottom: 32px;
+  max-width: 500px;
 }
 
 .game-actions {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: auto;
-}
-
-.game-actions .btn {
-  height: 52px;
-  padding: 0 24px;
-  font-size: 15px;
-  flex: 1;
-  min-width: 160px;
-}
-
-/* Expandable Detail */
-.game-detail {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s var(--ease-smooth);
-  border-top: 1px solid transparent;
-  margin-bottom: 20px;
-  margin-top: 0;
-}
-
-.game-detail.expanded {
-  max-height: 800px;
-  border-top-color: rgba(255,255,255,.15);
-  padding-top: 20px;
-  margin-top: 20px;
-}
-
-.game-detail-content {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: all 0.3s ease 0.1s;
-}
-
-.game-detail.expanded .game-detail-content {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.game-detail h4 {
-  font-size: 18px;
-  color: var(--text);
-  margin-bottom: 12px;
-  margin-top: 20px;
-}
-
-.game-detail h4:first-child {
-  margin-top: 0;
-}
-
-.game-detail p {
-  color: var(--dim);
-  line-height: 1.7;
-  margin-bottom: 16px;
-  font-size: 15px;
-}
-
-.game-detail ul {
-  margin-left: 20px;
-  color: var(--dim);
-  line-height: 1.8;
-}
-
-.game-detail ul li {
-  margin-bottom: 8px;
-  font-size: 15px;
-}
-
-.game-detail a {
-  color: var(--cyan);
-  text-decoration: underline;
-}
-
-.game-detail a:hover {
-  opacity: .8;
+  gap: 16px;
 }
 
 /* Empty State */
 .empty-state {
   text-align: center;
   padding: 80px 20px;
-  grid-column: 1 / -1;
+  margin: auto;
 }
 
 .empty-icon {
@@ -1401,6 +1315,7 @@ body.nav-open {
 
   .controls-bar {
     grid-template-columns: 1fr;
+    margin-bottom: 60px;
   }
 
   .filter-chips {
@@ -1410,42 +1325,24 @@ body.nav-open {
   .sort-select {
     order: 2;
   }
-
+  
+  /* Mobile Stacked Layout */
   .games-grid {
-    grid-template-columns: 1fr;
+    gap: 80px;
   }
-
-  .game-card,
-  .game-card:nth-child(odd),
+  
+  .game-card, 
   .game-card:nth-child(even) {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto 1fr;
+    flex-direction: column !important;
+    gap: 32px;
   }
-
-  .game-card:nth-child(odd) .game-thumb,
-  .game-card:nth-child(even) .game-thumb {
-    order: 1 !important;
-  }
-
-  .game-card:nth-child(odd) .game-body,
-  .game-card:nth-child(even) .game-body {
-    order: 2 !important;
-  }
-
+  
   .game-thumb {
-    aspect-ratio: 16/9;
+    width: 100%;
   }
 
   .game-body {
-    padding: 24px;
-  }
-
-  .game-title {
-    font-size: 24px;
-  }
-
-  .game-actions .btn {
-    min-width: 120px;
+    align-items: flex-start;
   }
 
   .contact-wrapper {
@@ -1489,24 +1386,9 @@ body.nav-open {
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-/* High Contrast Mode Support */
-@media (prefers-contrast: high) {
-  .btn-primary {
-    border: 2px solid currentColor;
-  }
-
-  .game-card,
-  .stat-card,
-  .philosophy-card {
-    border-width: 2px;
   }
 }
