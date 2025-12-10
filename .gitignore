@@ -1,1 +1,9 @@
-node_modules
+# Ignorovat tajná hesla a nastavení prostředí
+.env
+
+# Ignorovat složku s nainstalovanými knihovnami (to se na GitHub taky nedává)
+node_modules/
+
+# Ignorovat logy a dočasné soubory
+*.log
+.DS_Store

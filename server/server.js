@@ -3,15 +3,18 @@
    Node.js + Express (Vercel Compatible)
    ======================================== */
 
+// Načtení proměnných prostředí (pro bezpečné heslo k emailu)
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const nodemailer = require('nodemailer'); // Přidáno pro odesílání emailů
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ========== DATA (Místo databáze) ==========
-// Data jsou nyní "natvrdo" v kódu. ID musíme dopsat ručně.
 const PORTFOLIO_GAMES = [
   {
     id: 1,
@@ -69,7 +72,7 @@ app.use(express.json());
 // Servírování statických souborů z veřejné složky
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Logování požadavků (pro debug)
+// Logování požadavků (pro debug a testování)
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
@@ -93,7 +96,7 @@ app.get('/api/stats', (req, res) => {
 
 /**
  * GET /api/games
- * Vrací hry s možností filtrování (simulace SQL WHERE)
+ * Vrací hry s možností filtrování
  */
 app.get('/api/games', (req, res) => {
   const { search, genre, sort } = req.query;
@@ -120,12 +123,11 @@ app.get('/api/games', (req, res) => {
   } else if (sort === 'alpha') {
     results.sort((a, b) => a.title.localeCompare(b.title));
   } else {
-    // Default: Live první, pak podle vlastního pořadí
+    // Default: Live první, pak podle priority statusu
     const statusOrder = { 'Live': 0, 'In Dev': 1, 'Prototype': 2, 'Concept': 3 };
     results.sort((a, b) => (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99));
   }
 
-  // Malé zpoždění pro efekt načítání (volitelné)
   setTimeout(() => {
     res.json(results);
   }, 100);
@@ -147,32 +149,85 @@ app.get('/api/games/:id', (req, res) => {
 
 /**
  * POST /api/contact
- * Přijme zprávu, vypíše ji do konzole a vrátí úspěch (neukládá do DB)
+ * Odeslání skutečného emailu pomocí Nodemailer
+ * Slouží i pro testování QA scénářů (validace, error handling)
  */
-app.post('/api/contact', (req, res) => {
+app.post('/api/contact', async (req, res) => {
   const { email, message } = req.body;
 
+  // 1. Validace vstupů (Test: HTTP 400)
   if (!email || !message) {
-    return res.status(400).json({ error: 'Email and message are required' });
+    return res.status(400).json({ 
+      success: false, 
+      error: 'Email and message are required fields.' 
+    });
   }
 
-  // Jen vypíšeme do logu (na Vercelu uvidíte v záložce Logs)
-  console.log(`📧 FAKE CONTACT FORM: From ${email}, Msg: ${message}`);
-  
-  res.json({
-    success: true,
-    message: 'Message received (Simulation)',
-    id: Date.now()
-  });
+  // 2. Validace formátu emailu (Test: HTTP 400 regex check)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ 
+      success: false, 
+      error: 'Invalid email format provided.' 
+    });
+  }
+
+  try {
+    // Konfigurace transportéru pro Gmail
+    // Údaje se načítají z .env souboru (bezpečnost)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER, // gaminutestudio@gmail.com
+        pass: process.env.EMAIL_PASS  // Heslo aplikace (ne tvoje osobní heslo!)
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER, // Odesílatel musí být autentikovaný účet (Gmail politika)
+      to: 'gaminutestudio@gmail.com', // Kam má zpráva přijít
+      replyTo: email, // Když dáš v Gmailu "Odpovědět", půjde to na email uživatele
+      subject: `🎮 Gaminute Portfolio: New Message from ${email}`,
+      text: `Name/Email: ${email}\n\nMessage:\n${message}`,
+      html: `
+        <h3>New Contact Form Submission</h3>
+        <p><strong>From:</strong> ${email}</p>
+        <p><strong>Message:</strong></p>
+        <blockquote style="background: #f0f0f0; padding: 10px; border-left: 4px solid #00d4ff;">
+          ${message.replace(/\n/g, '<br>')}
+        </blockquote>
+      `
+    };
+
+    // Odeslání emailu
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Email sent successfully from ${email}`);
+
+    // Úspěšná odpověď (Test: HTTP 200)
+    res.status(200).json({
+      success: true,
+      message: 'Email has been sent successfully.',
+      id: Date.now()
+    });
+
+  } catch (error) {
+    console.error('❌ Email send error:', error);
+    
+    // Chyba serveru/SMTP (Test: HTTP 500)
+    res.status(500).json({
+      success: false,
+      error: 'Failed to send email via SMTP provider.'
+    });
+  }
 });
 
 // ========== SYSTEM ENDPOINTS ==========
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', mode: 'static-no-db' });
+  res.json({ status: 'ok', mode: 'static-no-db-email-enabled' });
 });
 
-// 404 handler - vrací index.html pro SPA (Single Page App) chování
+// 404 handler
 app.use((req, res) => {
   if (!req.path.startsWith('/api')) {
     res.sendFile(path.join(__dirname, '../public/index.html'));
@@ -181,15 +236,15 @@ app.use((req, res) => {
   }
 });
 
-// ========== SERVER START (Důležité pro Vercel!) ==========
+// ========== SERVER START ==========
 
-// 1. Exportujeme aplikaci, aby ji Vercel mohl spustit jako Serverless funkci
 module.exports = app;
 
-// 2. Server spustíme na portu JENOM pokud běžíme lokálně u tebe na PC
-// (Vercel si to spouští sám interně, tento kód ignoruje)
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`\n🚀 Server running in STATIC mode on http://localhost:${PORT}`);
+    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
+    if(!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.warn("⚠️  WARNING: EMAIL_USER or EMAIL_PASS missing in .env file. Emails will fail.");
+    }
   });
 }
