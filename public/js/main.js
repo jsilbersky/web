@@ -262,10 +262,11 @@ const Games = {
       filtered = filtered.filter(game => game.status === STATE.currentFilters.status);
     }
 
-    // Sort by status priority (Live > In Dev > Prototype > Concept)
-    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Prototype': 2, 'Concept': 3 };
+    // Sort by status priority (Live > In Dev > Concept)
+    // REMOVED 'Prototype'
+    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
     filtered.sort((a, b) => {
-      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
       return statusDiff !== 0 ? statusDiff : b.id - a.id;
     });
 
@@ -291,10 +292,10 @@ const Games = {
   },
 
   createCard(game) {
+    // REMOVED 'Prototype'
     const statusClass = {
       'Live': 'badge-live',
       'In Dev': 'badge-dev',
-      'Prototype': 'badge-concept',
       'Concept': 'badge-concept'
     }[game.status] || 'badge-concept';
 
