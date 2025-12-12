@@ -186,6 +186,7 @@ const Stats = {
 };
 
 // ========== GAMES SECTION (UPDATED) ==========
+// ========== GAMES SECTION (UPDATED) ==========
 const Games = {
   debounceTimer: null,
 
@@ -263,12 +264,18 @@ const Games = {
       filtered = filtered.filter(game => game.status === STATE.currentFilters.status);
     }
 
-    // Sort by status priority (Live > In Dev > Concept)
-    // REMOVED 'Prototype'
+    // Sort by status priority and then by priority field
     const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
     filtered.sort((a, b) => {
       const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
-      return statusDiff !== 0 ? statusDiff : b.id - a.id;
+      
+      // Primárně: podle statusu
+      if (statusDiff !== 0) {
+        return statusDiff;
+      }
+      
+      // Sekundárně: podle priority (nižší číslo = vyšší priorita)
+      return (a.priority || 999) - (b.priority || 999);
     });
 
     STATE.filteredGames = filtered;
@@ -286,14 +293,12 @@ const Games = {
     }
 
     emptyState.hidden = true;
-    grid.style.display = 'flex'; // Changed to flex for new layout
+    grid.style.display = 'flex';
     
-    // Create HTML
     grid.innerHTML = STATE.filteredGames.map(game => this.createCard(game)).join('');
   },
 
   createCard(game) {
-    // REMOVED 'Prototype'
     const statusClass = {
       'Live': 'badge-live',
       'In Dev': 'badge-dev',
@@ -302,12 +307,10 @@ const Games = {
 
     const hasUrl = game.url && game.url.trim() !== '';
     
-    // Button Logic: Live = CTA, Dev/Other = Static text/disabled
     let actionBtn;
     if (game.status === 'Live' && hasUrl) {
         actionBtn = `<a href="${game.url}" target="_blank" rel="noopener" class="btn btn-primary">Get on Google Play</a>`;
     } else {
-        // Just a status label button (not clickable)
         actionBtn = `<button class="btn btn-static" disabled>${game.status === 'In Dev' ? 'In Development' : 'Concept Only'}</button>`;
     }
 
