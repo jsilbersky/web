@@ -517,12 +517,13 @@ a {
   font-family: "Space Grotesk", sans-serif;
   font-size: clamp(32px, 5vw, 48px);
   font-weight: 800;
-  background: linear-gradient(135deg, var(--cyan), var(--pink));
+  background: none;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: #00d4ff;
   background-clip: text;
   display: block;
   margin-bottom: 8px;
+  color: #00d4ff;
 }
 
 .stat-label {
@@ -1392,3 +1393,4 @@ body.nav-open {
     transition-duration: 0.01ms !important;
   }
 }
+

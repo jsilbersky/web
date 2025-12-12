@@ -18,12 +18,12 @@ const PORTFOLIO_GAMES = [
   {
     id: 1,
     title: "Loading Rush",
-    description: "Hyper-casual reflex test. Tap with millisecond precision to stop the loading bar at the perfect moment. Features anti-cheat logic, global leaderboards, and haptic feedback that responds to your accuracy.",
+    description: "Hyper-casual reflex test. Turn the most boring part of gaming into a neon timing challenge. A simple one-tap game where you finally get to control the progress bar.",
     genre: "arcade",
     tech: "canvas",
     version: "1.0.2",
     status: "Live",
-    priority: 1, // First because it is Live
+    priority: 1, 
     url: "https://play.google.com/store/apps/details?id=com.jsilb.loadingrush",
     thumb: "img/loadingwebimg.webp",
     created_at: "2024-01-15T10:00:00Z"
@@ -36,7 +36,7 @@ const PORTFOLIO_GAMES = [
     tech: "dom",
     version: "1.4.5",
     status: "In Dev",
-    priority: 2, // Second (In Dev)
+    priority: 2,
     url: "",
     thumb: "img/lavawebimg.webp",
     created_at: "2024-03-20T10:00:00Z"
@@ -44,12 +44,12 @@ const PORTFOLIO_GAMES = [
   {
     id: 4,
     title: "Galaxiko Joystick",
-    description: "High-speed 3D tunnel runner using math-based perspective projection. Test your reflexes in a neon void as the tunnel twists and accelerates. Features procedural generation and dynamic difficulty adjustment.",
+    description: "A retro-style reflex test. Pilot your ship, shift colors to match hazards, and grab every star. Fast-paced and slightly unforgiving.",
     genre: "arcade",
     tech: "canvas",
     version: "0.5.0",
     status: "In Dev",
-    priority: 3, // Third (In Dev)
+    priority: 3, 
     url: "",
     thumb: "img/galaxikowebimg.webp",
     created_at: "2024-08-15T10:00:00Z"
@@ -62,20 +62,20 @@ const PORTFOLIO_GAMES = [
     tech: "canvas",
     version: "0.8.0",
     status: "In Dev",
-    priority: 4, // Fourth (In Dev)
+    priority: 4, 
     url: "",
     thumb: "img/shapeslash.webp",
     created_at: "2024-11-10T10:00:00Z"
   },
   {
     id: 3,
-    title: "Neon Coil",
-    description: "Modern survival arcade with 360-degree movement mechanics. Navigate through dynamic obstacles with glowing trail effects and starfield parallax backgrounds. Built with custom 2D rendering engine for maximum performance.",
+    title: "Neon Glide",
+    description: "A modern twist on the classic Snake mechanic. Guide the glowing coil directly with your finger, collect parts to grow, and try not to crash into your own tail.",
     genre: "arcade",
     tech: "canvas",
     version: "0.9.0",
     status: "Concept",
-    priority: 5, // Last because it is Concept
+    priority: 5, 
     url: "",
     thumb: "img/backgroundhero.webp",
     created_at: "2024-05-10T10:00:00Z"
