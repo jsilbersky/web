@@ -65,22 +65,35 @@ const Navigation = {
   },
 
   setupSmoothScroll() {
-    const links = document.querySelectorAll('a[href^="#"]');
-    links.forEach(link => {
+    // Hlavní navigace + mobilní odkazy
+    const allLinks = document.querySelectorAll('a[href^="#"]');
+    
+    allLinks.forEach(link => {
       link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
-        if (href === '#') return;
+        
+        // Ignoruj prázdné kotvy
+        if (!href || href === '#') return;
         
         e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth' });
-          
+        
+        const targetId = href.replace('#', '');
+        const targetSection = document.getElementById(targetId);
+        
+        if (targetSection) {
           // Zavři mobilní menu pokud je otevřené
           const panel = document.getElementById('mobile-panel');
           if (panel && panel.classList.contains('open')) {
             this.closeMobileMenu();
           }
+          
+          // Počkej na zavření menu, pak scrolluj
+          setTimeout(() => {
+            targetSection.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }, 50);
         }
       });
     });
@@ -110,15 +123,21 @@ const Navigation = {
   setupMobileMenu() {
     const hamburger = document.getElementById('hamburger');
     const panel = document.getElementById('mobile-panel');
-    const backdrop = panel?.querySelector('.mobile-panel__backdrop');
-    const mobileLinks = panel?.querySelectorAll('.mobile-link, .btn');
+    const backdrop = document.getElementById('mobile-backdrop');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
 
-    if (!hamburger || !panel) return;
+    if (!hamburger || !panel) {
+      console.warn('Mobile menu elements not found');
+      return;
+    }
 
-    // Toggle hamburger
+    // Hamburger toggle
     hamburger.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
+      
       const isOpen = panel.classList.contains('open');
+      
       if (isOpen) {
         this.closeMobileMenu();
       } else {
@@ -126,21 +145,31 @@ const Navigation = {
       }
     });
 
-    // Klik na backdrop zavře menu
-    backdrop?.addEventListener('click', () => this.closeMobileMenu());
+    // Backdrop zavře menu
+    if (backdrop) {
+      backdrop.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.closeMobileMenu();
+      });
+    }
 
-    // Klik na jakýkoliv link zavře menu
-    mobileLinks?.forEach(link => {
+    // Každý mobilní link zavře menu
+    mobileLinks.forEach(link => {
       link.addEventListener('click', () => {
-        // Malé zpoždění pro plynulý efekt
-        setTimeout(() => this.closeMobileMenu(), 200);
+        // Zavřeme menu s malým zpožděním pro plynulost
+        setTimeout(() => {
+          this.closeMobileMenu();
+        }, 100);
       });
     });
 
-    // ESC klávesa zavře menu
+    // ESC zavře menu
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && panel.classList.contains('open')) {
-        this.closeMobileMenu();
+      if (e.key === 'Escape') {
+        const isOpen = panel.classList.contains('open');
+        if (isOpen) {
+          this.closeMobileMenu();
+        }
       }
     });
   },
@@ -149,18 +178,26 @@ const Navigation = {
     const hamburger = document.getElementById('hamburger');
     const panel = document.getElementById('mobile-panel');
     
+    if (!panel || !hamburger) return;
+    
     panel.classList.add('open');
     hamburger.classList.add('active');
     document.body.classList.add('nav-open');
+    
+    console.log('Menu opened');
   },
 
   closeMobileMenu() {
     const hamburger = document.getElementById('hamburger');
     const panel = document.getElementById('mobile-panel');
     
+    if (!panel || !hamburger) return;
+    
     panel.classList.remove('open');
     hamburger.classList.remove('active');
     document.body.classList.remove('nav-open');
+    
+    console.log('Menu closed');
   }
 };
 

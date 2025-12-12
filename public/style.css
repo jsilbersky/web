@@ -189,7 +189,7 @@ a {
 #main-header {
   position: sticky;
   top: 0;
-  z-index: 2000;
+  z-index: 3000;
   backdrop-filter: blur(12px);
   background: rgba(10,14,26,.95);
   border-bottom: 1px solid rgba(255,255,255,.15);
@@ -297,7 +297,7 @@ a {
 .hamburger {
   display: none;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
   width: 36px;
   height: 36px;
@@ -307,7 +307,7 @@ a {
   border: 1px solid rgba(255,255,255,.2);
   background: rgba(255,255,255,.05);
   transition: all .2s ease;
-  z-index: 2100;
+  z-index: 3100;
   position: relative;
 }
 
@@ -322,6 +322,7 @@ a {
 
 .hamburger:hover {
   background: rgba(255,255,255,.10);
+  border-color: rgba(255,255,255,.3);
 }
 
 .hamburger.active {
@@ -329,17 +330,21 @@ a {
   border-color: var(--pink);
 }
 
+.hamburger.active span {
+  background: var(--pink);
+}
+
 .hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translateY(7px);
+  transform: rotate(45deg) translate(7px, 7px);
 }
 
 .hamburger.active span:nth-child(2) {
   opacity: 0;
-  transform: translateX(-20px);
+  transform: scale(0);
 }
 
 .hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translateY(-7px);
+  transform: rotate(-45deg) translate(7px, -7px);
 }
 
 /* Mobile Panel */
@@ -349,11 +354,13 @@ a {
   z-index: 2050;
   pointer-events: none;
   visibility: hidden;
+  transition: visibility 0s linear 0.3s;
 }
 
 .mobile-panel.open {
   pointer-events: auto;
   visibility: visible;
+  transition: visibility 0s linear 0s;
 }
 
 .mobile-panel__backdrop {
@@ -402,80 +409,13 @@ a {
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.12);
   transition: all .2s ease;
+  cursor: pointer;
 }
 
 .mobile-link:active {
-  background: rgba(255,255,255,.08);
+  background: rgba(0,212,255,.15);
+  border-color: var(--cyan);
   transform: scale(0.98);
-}
-
-.mobile-panel__sheet .btn {
-  width: 100%;
-  margin-top: 8px;
-}
-
-/* Mobile Panel */
-.mobile-panel {
-  position: fixed;
-  inset: 0;
-  z-index: 2050;
-  pointer-events: none;
-}
-
-.mobile-panel[aria-hidden="false"] {
-  pointer-events: auto;
-}
-
-.mobile-panel__backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(7,10,18,.8);
-  backdrop-filter: blur(8px);
-  opacity: 0;
-  transition: opacity .3s ease;
-}
-
-.mobile-panel[aria-hidden="false"] .mobile-panel__backdrop {
-  opacity: 1;
-}
-
-.mobile-panel__sheet {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(85vw, 380px);
-  background: linear-gradient(135deg, rgba(10,14,26,.98), rgba(10,14,26,.95));
-  border-left: 1px solid rgba(255,255,255,.2);
-  padding: 88px 20px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  transform: translateX(100%);
-  transition: transform .3s var(--ease-smooth);
-  overflow-y: auto;
-  box-shadow: -10px 0 40px rgba(0,0,0,.5);
-}
-
-.mobile-panel[aria-hidden="false"] .mobile-panel__sheet {
-  transform: translateX(0);
-}
-
-.mobile-link {
-  display: flex;
-  align-items: center;
-  padding: 14px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 17px;
-  color: var(--text);
-  background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.12);
-  transition: all .2s ease;
-}
-
-.mobile-link:active {
-  background: rgba(255,255,255,.08);
 }
 
 .mobile-panel__sheet .btn {
