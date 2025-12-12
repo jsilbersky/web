@@ -88,48 +88,41 @@ app.use((req, res, next) => {
 });
 
 // ========== API ENDPOINTS ==========
-
 app.get('/api/games', (req, res) => {
-  const { search, genre, sort } = req.query;
-  
-  let results = [...PORTFOLIO_GAMES];
+  const { search, genre, sort } = req.query;
+  
+  let results = [...PORTFOLIO_GAMES];
 
-  if (genre && genre !== 'all') {
-    results = results.filter(g => g.genre === genre);
-  }
+  if (genre && genre !== 'all') {
+    results = results.filter(g => g.genre === genre);
+  }
 
-  if (search) {
-    const term = search.toLowerCase();
-    results = results.filter(g => 
-      g.title.toLowerCase().includes(term) || 
-      g.description.toLowerCase().includes(term)
-    );
-  }
+  if (search) {
+    const term = search.toLowerCase();
+    results = results.filter(g => 
+      g.title.toLowerCase().includes(term) || 
+      g.description.toLowerCase().includes(term)
+    );
+  }
 
-  if (sort === 'oldest') {
-    results.sort((a, b) => a.id - b.id);
-  } else if (sort === 'alpha') {
-    results.sort((a, b) => a.title.localeCompare(b.title));
-  } else {
-    // Default: Sort by status priority (Live: 0, In Dev: 1, Concept: 2)
-    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
-    
-    results.sort((a, b) => {
-      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
-      
-      // Primary sort: by Status priority (Live > In Dev > Concept)
-      if (statusDiff !== 0) {
-        return statusDiff;
-      }
-      
-      // Secondary sort: if status is the same (statusDiff === 0), sort by descending ID (newest first)
-      return b.id - a.id; 
-    });
-  }
+  // Řazení
+  const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+  
+  results.sort((a, b) => {
+    const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+    
+    // Primárně: Status (Live > In Dev > Concept)
+    if (statusDiff !== 0) {
+      return statusDiff;
+    }
+    
+    // Sekundárně: Novější ID první (b.id - a.id)
+    return b.id - a.id; 
+  });
 
-  setTimeout(() => {
-    res.json(results);
-  }, 100);
+  setTimeout(() => {
+    res.json(results);
+  }, 100);
 });
 
 app.get('/api/stats', (req, res) => {
