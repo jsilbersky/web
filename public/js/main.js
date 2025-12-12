@@ -18,7 +18,7 @@ const STATE = {
 const API = {
   baseURL: '/api',
   
-  async fetchStats() {
+async fetchStats() {
     try {
       const res = await fetch(`${this.baseURL}/stats`);
       if (!res.ok) throw new Error('Stats fetch failed');
@@ -26,7 +26,8 @@ const API = {
     } catch (err) {
       console.error('API Error:', err);
       // Fallback data
-      return { totalGames: 4, liveGames: 1, inDev: 2 };
+      // Opravujeme záložní data, aby odpovídala 5 hrám, 1 Live, 3 In Dev
+      return { totalGames: 5, liveGames: 1, inDev: 3 }; 
     }
   },
 
@@ -166,7 +167,7 @@ const Stats = {
     grid.innerHTML = `
       <div class="stat-card reveal">
         <span class="stat-number">${data.totalGames}</span>
-        <span class="stat-label">Games Built</span>
+        <span class="stat-label">Games in portfolio</span>
       </div>
       <div class="stat-card reveal">
         <span class="stat-number">${data.liveGames}</span>

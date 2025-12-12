@@ -132,14 +132,58 @@ app.get('/api/games', (req, res) => {
   }, 100);
 });
 
-app.get('/api/games/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const game = PORTFOLIO_GAMES.find(g => g.id === id);
+app.get('/api/stats', (req, res) => {
+  const stats = {
+    totalGames: PORTFOLIO_GAMES.length,
+    liveGames: PORTFOLIO_GAMES.filter(g => g.status === 'Live').length,
+    // ZDE BYL PROBLÉM - POČET In Dev musí být 3
+    inDev: PORTFOLIO_GAMES.filter(g => g.status === 'In Dev').length,
+    concepts: PORTFOLIO_GAMES.filter(g => g.status === 'Concept').length
+  };
+  res.json(stats);
+});
 
-  if (!game) {
-    return res.status(404).json({ error: 'Game not found' });
-  }
-  res.json(game);
+app.get('/api/games', (req, res) => {
+  const { search, genre, sort } = req.query;
+  
+  let results = [...PORTFOLIO_GAMES];
+
+  if (genre && genre !== 'all') {
+    results = results.filter(g => g.genre === genre);
+  }
+
+  if (search) {
+    const term = search.toLowerCase();
+    results = results.filter(g => 
+      g.title.toLowerCase().includes(term) || 
+      g.description.toLowerCase().includes(term)
+    );
+  }
+
+  if (sort === 'oldest') {
+    results.sort((a, b) => a.id - b.id);
+  } else if (sort === 'alpha') {
+    results.sort((a, b) => a.title.localeCompare(b.title));
+  } else {
+    // Default: Hlavní řazení dle Statusu, Sekundární dle ID sestupně (novější In Dev hra je výše)
+    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+    
+    results.sort((a, b) => {
+      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+      
+      // 1. Primární řazení: podle statusu (Live je 0, tedy první)
+      if (statusDiff !== 0) {
+        return statusDiff;
+      }
+      
+      // 2. Sekundární řazení: pokud je status stejný, řadíme dle ID sestupně (b.id - a.id)
+      return b.id - a.id; 
+    });
+  }
+
+  setTimeout(() => {
+    res.json(results);
+  }, 100);
 });
 
 app.post('/api/contact', async (req, res) => {
