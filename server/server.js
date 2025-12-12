@@ -23,7 +23,7 @@ const PORTFOLIO_GAMES = [
     tech: "canvas",
     version: "1.0.2",
     status: "Live",
-    priority: 1, // ← Nižší = vyšší priorita (první na webu)
+    priority: 1, // First because it is Live
     url: "https://play.google.com/store/apps/details?id=com.jsilb.loadingrush",
     thumb: "img/loadingwebimg.webp",
     created_at: "2024-01-15T10:00:00Z"
@@ -36,23 +36,10 @@ const PORTFOLIO_GAMES = [
     tech: "dom",
     version: "1.4.5",
     status: "In Dev",
-    priority: 2,
+    priority: 2, // Second (In Dev)
     url: "",
     thumb: "img/lavawebimg.webp",
     created_at: "2024-03-20T10:00:00Z"
-  },
-  {
-    id: 3,
-    title: "Neon Coil",
-    description: "Modern survival arcade with 360-degree movement mechanics. Navigate through dynamic obstacles with glowing trail effects and starfield parallax backgrounds. Built with custom 2D rendering engine for maximum performance.",
-    genre: "arcade",
-    tech: "canvas",
-    version: "0.9.0",
-    status: "Concept",
-    priority: 5,
-    url: "",
-    thumb: "img/backgroundhero.webp",
-    created_at: "2024-05-10T10:00:00Z"
   },
   {
     id: 4,
@@ -62,7 +49,7 @@ const PORTFOLIO_GAMES = [
     tech: "canvas",
     version: "0.5.0",
     status: "In Dev",
-    priority: 3,
+    priority: 3, // Third (In Dev)
     url: "",
     thumb: "img/galaxikowebimg.webp",
     created_at: "2024-08-15T10:00:00Z"
@@ -75,10 +62,23 @@ const PORTFOLIO_GAMES = [
     tech: "canvas",
     version: "0.8.0",
     status: "In Dev",
-    priority: 4,
+    priority: 4, // Fourth (In Dev)
     url: "",
     thumb: "img/shapeslash.webp",
     created_at: "2024-11-10T10:00:00Z"
+  },
+  {
+    id: 3,
+    title: "Neon Coil",
+    description: "Modern survival arcade with 360-degree movement mechanics. Navigate through dynamic obstacles with glowing trail effects and starfield parallax backgrounds. Built with custom 2D rendering engine for maximum performance.",
+    genre: "arcade",
+    tech: "canvas",
+    version: "0.9.0",
+    status: "Concept",
+    priority: 5, // Last because it is Concept
+    url: "",
+    thumb: "img/backgroundhero.webp",
+    created_at: "2024-05-10T10:00:00Z"
   }
 ];
 
