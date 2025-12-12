@@ -18,22 +18,20 @@ const STATE = {
 const API = {
   baseURL: '/api',
   
-async fetchStats() {
+  async fetchStats() {
     try {
-      const res = await fetch(`${this.baseURL}/stats`);
+      const res = await fetch(`${this.baseURL}/stats?t=${Date.now()}`);
       if (!res.ok) throw new Error('Stats fetch failed');
       return await res.json();
     } catch (err) {
       console.error('API Error:', err);
-      // Fallback data
-      // Opravujeme záložní data, aby odpovídala 5 hrám, 1 Live, 3 In Dev
       return { totalGames: 5, liveGames: 1, inDev: 3 }; 
     }
   },
 
   async fetchGames() {
     try {
-      const res = await fetch(`${this.baseURL}/games`);
+      const res = await fetch(`${this.baseURL}/games?t=${Date.now()}`);
       if (!res.ok) throw new Error('Games fetch failed');
       return await res.json();
     } catch (err) {
@@ -77,7 +75,12 @@ const Navigation = {
         const target = document.querySelector(href);
         if (target) {
           target.scrollIntoView({ behavior: 'smooth' });
-          this.closeMobileMenu();
+          
+          // Zavři mobilní menu pokud je otevřené
+          const panel = document.getElementById('mobile-panel');
+          if (panel && panel.classList.contains('open')) {
+            this.closeMobileMenu();
+          }
         }
       });
     });
@@ -108,27 +111,35 @@ const Navigation = {
     const hamburger = document.getElementById('hamburger');
     const panel = document.getElementById('mobile-panel');
     const backdrop = panel?.querySelector('.mobile-panel__backdrop');
-    const mobileLinks = panel?.querySelectorAll('.mobile-link');
+    const mobileLinks = panel?.querySelectorAll('.mobile-link, .btn');
 
     if (!hamburger || !panel) return;
 
-    hamburger.addEventListener('click', () => {
-      const isHidden = panel.hidden;
-      if (isHidden) {
-        this.openMobileMenu();
-      } else {
+    // Toggle hamburger
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = panel.classList.contains('open');
+      if (isOpen) {
         this.closeMobileMenu();
+      } else {
+        this.openMobileMenu();
       }
     });
 
+    // Klik na backdrop zavře menu
     backdrop?.addEventListener('click', () => this.closeMobileMenu());
+
+    // Klik na jakýkoliv link zavře menu
     mobileLinks?.forEach(link => {
-      link.addEventListener('click', () => this.closeMobileMenu());
+      link.addEventListener('click', () => {
+        // Malé zpoždění pro plynulý efekt
+        setTimeout(() => this.closeMobileMenu(), 200);
+      });
     });
 
-    // Close on ESC
+    // ESC klávesa zavře menu
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !panel.hidden) {
+      if (e.key === 'Escape' && panel.classList.contains('open')) {
         this.closeMobileMenu();
       }
     });
@@ -138,8 +149,7 @@ const Navigation = {
     const hamburger = document.getElementById('hamburger');
     const panel = document.getElementById('mobile-panel');
     
-    panel.hidden = false;
-    setTimeout(() => panel.setAttribute('aria-hidden', 'false'), 10);
+    panel.classList.add('open');
     hamburger.classList.add('active');
     document.body.classList.add('nav-open');
   },
@@ -148,13 +158,9 @@ const Navigation = {
     const hamburger = document.getElementById('hamburger');
     const panel = document.getElementById('mobile-panel');
     
-    panel.setAttribute('aria-hidden', 'true');
+    panel.classList.remove('open');
     hamburger.classList.remove('active');
     document.body.classList.remove('nav-open');
-    
-    setTimeout(() => {
-      panel.hidden = true;
-    }, 300);
   }
 };
 
@@ -185,8 +191,7 @@ const Stats = {
   }
 };
 
-// ========== GAMES SECTION (UPDATED) ==========
-// ========== GAMES SECTION (UPDATED) ==========
+// ========== GAMES SECTION ==========
 const Games = {
   debounceTimer: null,
 
@@ -207,7 +212,6 @@ const Games = {
     const statusSelect = document.getElementById('status-select');
     const resetBtn = document.getElementById('reset-filters');
 
-    // Search with debounce
     searchInput?.addEventListener('input', (e) => {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = setTimeout(() => {
@@ -216,7 +220,6 @@ const Games = {
       }, 300);
     });
 
-    // Genre filters
     filterChips?.forEach(chip => {
       chip.addEventListener('click', () => {
         filterChips.forEach(c => c.classList.remove('active'));
@@ -226,13 +229,11 @@ const Games = {
       });
     });
 
-    // Status filter
     statusSelect?.addEventListener('change', (e) => {
       STATE.currentFilters.status = e.target.value;
       this.applyFilters();
     });
 
-    // Reset filters
     resetBtn?.addEventListener('click', () => {
       searchInput.value = '';
       STATE.currentFilters = { search: '', genre: 'all', status: 'all' };
@@ -243,7 +244,7 @@ const Games = {
     });
   },
 
-applyFilters() {
+  applyFilters() {
     let filtered = [...STATE.games];
 
     // Search filter
@@ -264,24 +265,23 @@ applyFilters() {
       filtered = filtered.filter(game => game.status === STATE.currentFilters.status);
     }
 
-    // === SORTING FIX START ===
+    // Řazení - STEJNÉ jako na serveru
     const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
     
     filtered.sort((a, b) => {
-      // 1. RULE: "Loading Rush" must ALWAYS be first
+      // 1. Loading Rush vždy první
       if (a.title === "Loading Rush") return -1;
       if (b.title === "Loading Rush") return 1;
 
-      // 2. Sort by Status (Live -> In Dev -> Concept)
+      // 2. Řazení podle statusu
       const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
       if (statusDiff !== 0) {
         return statusDiff;
       }
       
-      // 3. Sort by Priority (Lower number = higher)
+      // 3. Řazení podle priority
       return (a.priority || 999) - (b.priority || 999);
     });
-    // === SORTING FIX END ===
 
     STATE.filteredGames = filtered;
     this.render();
@@ -355,7 +355,6 @@ const ContactForm = {
 
     this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     
-    // Live validation
     const emailInput = document.getElementById('email');
     const messageInput = document.getElementById('message');
 
@@ -514,6 +513,8 @@ const Utils = {
 
 // ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', async () => {
+  console.log('🎮 Gaminute Portfolio Loaded');
+  
   Utils.updateYear();
   Navigation.init();
   ContactForm.init();

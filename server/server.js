@@ -25,8 +25,7 @@ const PORTFOLIO_GAMES = [
     status: "Live",
     priority: 1, 
     url: "https://play.google.com/store/apps/details?id=com.jsilb.loadingrush",
-    thumb: "img/loadingwebimg.webp",
-    created_at: "2024-01-15T10:00:00Z"
+    thumb: "img/loadingwebimg.webp"
   },
   {
     id: 2,
@@ -38,21 +37,19 @@ const PORTFOLIO_GAMES = [
     status: "In Dev",
     priority: 2,
     url: "",
-    thumb: "img/lavawebimg.webp",
-    created_at: "2024-03-20T10:00:00Z"
+    thumb: "img/lavawebimg.webp"
   },
   {
     id: 4,
     title: "Galaxiko Joystick",
-    description: "A retro-style reflex test. Pilot your ship, shift colors to match hazards, and grab every star. Fast-paced and slightly unforgiving.",
+    description: "Survival is simple: Match the color or crash. Pilot your ship through a neon tunnel that gets faster every second. Panic is your enemy, speed is your friend.",
     genre: "arcade",
     tech: "canvas",
     version: "0.5.0",
     status: "In Dev",
     priority: 3, 
     url: "",
-    thumb: "img/galaxikowebimg.webp",
-    created_at: "2024-08-15T10:00:00Z"
+    thumb: "img/galaxikowebimg.webp"
   },
   {
     id: 5,
@@ -64,8 +61,7 @@ const PORTFOLIO_GAMES = [
     status: "In Dev",
     priority: 4, 
     url: "",
-    thumb: "img/shapeslash.webp",
-    created_at: "2024-11-10T10:00:00Z"
+    thumb: "img/shapeslash.webp"
   },
   {
     id: 3,
@@ -77,14 +73,22 @@ const PORTFOLIO_GAMES = [
     status: "Concept",
     priority: 5, 
     url: "",
-    thumb: "img/backgroundhero.webp",
-    created_at: "2024-05-10T10:00:00Z"
+    thumb: "img/backgroundhero.webp"
   }
 ];
 
 // ========== MIDDLEWARE ==========
 app.use(cors());
 app.use(express.json());
+
+// DŮLEŽITÉ: Zakázat cache pro vývoj
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use((req, res, next) => {
@@ -114,31 +118,23 @@ app.get('/api/games', (req, res) => {
     );
   }
 
-  // Řazení
-  if (sort === 'oldest') {
-    results.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-  } else if (sort === 'alpha') {
-    results.sort((a, b) => a.title.localeCompare(b.title));
-  } else {
-    // Default: Řazení podle statusu a priority
-    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+  // Řazení - POUZE podle priority (frontend si to seřadí sám)
+  // Server vrací data v základním pořadí podle priority
+  results.sort((a, b) => {
+    // Loading Rush vždy první
+    if (a.title === "Loading Rush") return -1;
+    if (b.title === "Loading Rush") return 1;
     
-    results.sort((a, b) => {
-      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
-      
-      // 1. Primární řazení: podle statusu (Live > In Dev > Concept)
-      if (statusDiff !== 0) {
-        return statusDiff;
-      }
-      
-      // 2. Sekundární řazení: podle priority (nižší číslo = vyšší priorita)
-      return (a.priority || 999) - (b.priority || 999);
-    });
-  }
+    // Pak podle statusu
+    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+    const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+    if (statusDiff !== 0) return statusDiff;
+    
+    // Nakonec podle priority
+    return (a.priority || 999) - (b.priority || 999);
+  });
 
-  setTimeout(() => {
-    res.json(results);
-  }, 100);
+  res.json(results);
 });
 
 // GET /api/stats - Statistiky portfolia
@@ -228,7 +224,8 @@ app.get('/api/health', (req, res) => {
     status: 'ok', 
     mode: 'static-no-db-email-enabled',
     timestamp: new Date().toISOString(),
-    games: PORTFOLIO_GAMES.length
+    games: PORTFOLIO_GAMES.length,
+    version: '1.0.1' // Změňte toto číslo při každé změně dat
   });
 });
 
@@ -252,6 +249,7 @@ if (require.main === module) {
     console.log(`✅ Live games: ${PORTFOLIO_GAMES.filter(g => g.status === 'Live').length}`);
     console.log(`🔧 In Dev: ${PORTFOLIO_GAMES.filter(g => g.status === 'In Dev').length}`);
     console.log(`💡 Concepts: ${PORTFOLIO_GAMES.filter(g => g.status === 'Concept').length}`);
+    console.log(`\n💡 TIP: Změny vidíte v prohlížeči po Ctrl+Shift+R (hard refresh)\n`);
     
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.warn("⚠️  WARNING: EMAIL_USER or EMAIL_PASS missing in .env file. Emails will fail.");
