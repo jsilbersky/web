@@ -243,7 +243,7 @@ const Games = {
     });
   },
 
-  applyFilters() {
+applyFilters() {
     let filtered = [...STATE.games];
 
     // Search filter
@@ -264,19 +264,24 @@ const Games = {
       filtered = filtered.filter(game => game.status === STATE.currentFilters.status);
     }
 
-    // Sort by status priority and then by priority field
+    // === SORTING FIX START ===
     const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+    
     filtered.sort((a, b) => {
+      // 1. RULE: "Loading Rush" must ALWAYS be first
+      if (a.title === "Loading Rush") return -1;
+      if (b.title === "Loading Rush") return 1;
+
+      // 2. Sort by Status (Live -> In Dev -> Concept)
       const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
-      
-      // Primárně: podle statusu
       if (statusDiff !== 0) {
         return statusDiff;
       }
       
-      // Sekundárně: podle priority (nižší číslo = vyšší priorita)
+      // 3. Sort by Priority (Lower number = higher)
       return (a.priority || 999) - (b.priority || 999);
     });
+    // === SORTING FIX END ===
 
     STATE.filteredGames = filtered;
     this.render();
