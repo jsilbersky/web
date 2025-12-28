@@ -203,7 +203,7 @@ const Navigation = {
     });
   },
 
-  setupActiveLink() {
+setupActiveLink() {
     const sections = document.querySelectorAll('.section');
     const navLinks = document.querySelectorAll('.nav-link, .mobile-link');
 
@@ -214,12 +214,16 @@ const Navigation = {
             const id = entry.target.id;
             navLinks.forEach(link => {
               const href = link.getAttribute('href');
-              link.classList.toggle('active', href === `#${id}`);
+              if (href === `#${id}`) {
+                  link.classList.add('active');
+              } else {
+                  link.classList.remove('active');
+              }
             });
           }
         });
       },
-      { threshold: 0.3, rootMargin: '-100px 0px -100px 0px' }
+      { rootMargin: '-50% 0px -50% 0px' } 
     );
 
     sections.forEach(section => observer.observe(section));
@@ -422,19 +426,22 @@ const Games = {
     this.render();
   },
 
-  sortGames(games) {
-    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+sortGames(games) {
+    const statusOrder = { 'live': 0, 'in dev': 1 };
     
     return games.sort((a, b) => {
-      // Loading Rush always first
-      if (a.title === "Loading Rush") return -1;
-      if (b.title === "Loading Rush") return 1;
 
-      // Sort by status
-      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+      const statA = a.status ? a.status.toLowerCase().trim() : '';
+      const statB = b.status ? b.status.toLowerCase().trim() : '';
+
+
+      const valA = statusOrder[statA] !== undefined ? statusOrder[statA] : 99;
+      const valB = statusOrder[statB] !== undefined ? statusOrder[statB] : 99;
+      
+      const statusDiff = valA - valB;
+      
       if (statusDiff !== 0) return statusDiff;
       
-      // Sort by priority
       return (a.priority || 999) - (b.priority || 999);
     });
   },

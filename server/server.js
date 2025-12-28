@@ -1,5 +1,5 @@
 /* ========================================
-   GAMINUTE - MODERN EXPRESS SERVER
+   GAMINUTE - SERVER
    Production-ready Node.js backend
    ======================================== */
 
@@ -68,7 +68,7 @@ const PORTFOLIO_GAMES = [
     genre: "puzzle",
     tech: "canvas",
     version: "0.8.0",
-    status: "In Dev",
+    status: "Live",
     priority: 4,
     url: "",
     thumb: "img/shapeslash.webp"
@@ -80,7 +80,7 @@ const PORTFOLIO_GAMES = [
     genre: "arcade",
     tech: "canvas",
     version: "0.9.0",
-    status: "Concept",
+    status: "In Dev",
     priority: 5,
     url: "",
     thumb: "img/backgroundhero.webp"
@@ -288,18 +288,18 @@ class GamesService {
   }
   
   static sortGames(games) {
-    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+    const statusOrder = { 'live': 0, 'in dev': 1 };
     
     return games.sort((a, b) => {
-      // Loading Rush always first
-      if (a.title === "Loading Rush") return -1;
-      if (b.title === "Loading Rush") return 1;
+      const statA = a.status.toLowerCase().trim();
+      const statB = b.status.toLowerCase().trim();
+
+      const valA = statusOrder[statA] !== undefined ? statusOrder[statA] : 99;
+      const valB = statusOrder[statB] !== undefined ? statusOrder[statB] : 99;
       
-      // Sort by status
-      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+      const statusDiff = valA - valB;
       if (statusDiff !== 0) return statusDiff;
       
-      // Sort by priority
       return (a.priority || 999) - (b.priority || 999);
     });
   }
@@ -437,11 +437,20 @@ function startServer() {
     console.log('='.repeat(50) + '\n');
   });
   
-  // Graceful shutdown
+  // 1. SIGTERM (pro Vercel/Hosting)
   process.on('SIGTERM', () => {
-    console.log('⏹️  SIGTERM received, closing server...');
+    console.log('\n⏹️  SIGTERM received, closing server...');
     server.close(() => {
       console.log('✅ Server closed');
+      process.exit(0);
+    });
+  });
+
+  // 2. SIGINT (pro tvůj CTRL + C ve Windows)
+  process.on('SIGINT', () => {
+    console.log('\n⏹️  SIGINT (CTRL+C) received. Closing server gracefully...');
+    server.close(() => {
+      console.log('✅ Server closed properly.');
       process.exit(0);
     });
   });
