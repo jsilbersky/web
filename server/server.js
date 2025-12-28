@@ -1,6 +1,6 @@
 /* ========================================
-   GAMINUTE - STATIC SERVER (NO DATABASE)
-   Node.js + Express (Vercel Compatible)
+   GAMINUTE - MODERN EXPRESS SERVER
+   Production-ready Node.js backend
    ======================================== */
 
 require('dotenv').config();
@@ -10,10 +10,20 @@ const cors = require('cors');
 const path = require('path');
 const nodemailer = require('nodemailer');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// ========== CONFIGURATION ==========
+const CONFIG = {
+  PORT: process.env.PORT || 3000,
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_PASS: process.env.EMAIL_PASS,
+  EMAIL_TO: process.env.EMAIL_TO || 'gaminutestudio@gmail.com',
+  RATE_LIMIT: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    maxRequests: 100
+  }
+};
 
-// ========== DATA ==========
+// ========== DATA LAYER ==========
 const PORTFOLIO_GAMES = [
   {
     id: 1,
@@ -23,7 +33,7 @@ const PORTFOLIO_GAMES = [
     tech: "canvas",
     version: "1.0.2",
     status: "Live",
-    priority: 1, 
+    priority: 1,
     url: "https://play.google.com/store/apps/details?id=com.jsilb.loadingrush",
     thumb: "img/loadingwebimg.webp"
   },
@@ -34,9 +44,9 @@ const PORTFOLIO_GAMES = [
     genre: "puzzle",
     tech: "dom",
     version: "1.4.5",
-    status: "In Dev",
+    status: "Live",
     priority: 2,
-    url: "",
+    url: "https://play.google.com/store/apps/details?id=com.gaminute.tictactoelava",
     thumb: "img/lavawebimg.webp"
   },
   {
@@ -46,9 +56,9 @@ const PORTFOLIO_GAMES = [
     genre: "arcade",
     tech: "canvas",
     version: "0.5.0",
-    status: "In Dev",
-    priority: 3, 
-    url: "",
+    status: "Live",
+    priority: 3,
+    url: "https://play.google.com/store/apps/details?id=com.gaminute.galaxikojoystick",
     thumb: "img/galaxikowebimg.webp"
   },
   {
@@ -59,7 +69,7 @@ const PORTFOLIO_GAMES = [
     tech: "canvas",
     version: "0.8.0",
     status: "In Dev",
-    priority: 4, 
+    priority: 4,
     url: "",
     thumb: "img/shapeslash.webp"
   },
@@ -71,188 +81,378 @@ const PORTFOLIO_GAMES = [
     tech: "canvas",
     version: "0.9.0",
     status: "Concept",
-    priority: 5, 
+    priority: 5,
     url: "",
     thumb: "img/backgroundhero.webp"
   }
 ];
 
-// ========== MIDDLEWARE ==========
-app.use(cors());
-app.use(express.json());
-
-// DŮLEŽITÉ: Zakázat cache pro vývoj
-app.use((req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  next();
-});
-
-app.use(express.static(path.join(__dirname, '../public')));
-
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
-
-// ========== API ENDPOINTS ==========
-
-// GET /api/games - Hlavní endpoint pro načtení her
-app.get('/api/games', (req, res) => {
-  const { search, genre, sort } = req.query;
-  
-  let results = [...PORTFOLIO_GAMES];
-
-  // Filtr podle žánru
-  if (genre && genre !== 'all') {
-    results = results.filter(g => g.genre === genre);
+// ========== EMAIL SERVICE ==========
+class EmailService {
+  constructor() {
+    this.transporter = null;
+    this.isConfigured = false;
   }
 
-  // Filtr podle vyhledávání
-  if (search) {
-    const term = search.toLowerCase();
-    results = results.filter(g => 
-      g.title.toLowerCase().includes(term) || 
-      g.description.toLowerCase().includes(term)
-    );
+  initialize() {
+    if (!CONFIG.EMAIL_USER || !CONFIG.EMAIL_PASS) {
+      console.warn('⚠️  Email not configured (missing EMAIL_USER or EMAIL_PASS)');
+      return false;
+    }
+
+    try {
+      this.transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: CONFIG.EMAIL_USER,
+          pass: CONFIG.EMAIL_PASS
+        }
+      });
+      this.isConfigured = true;
+      console.log('✅ Email service configured');
+      return true;
+    } catch (error) {
+      console.error('❌ Email service failed:', error.message);
+      return false;
+    }
   }
 
-  // Řazení - POUZE podle priority (frontend si to seřadí sám)
-  // Server vrací data v základním pořadí podle priority
-  results.sort((a, b) => {
-    // Loading Rush vždy první
-    if (a.title === "Loading Rush") return -1;
-    if (b.title === "Loading Rush") return 1;
-    
-    // Pak podle statusu
-    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
-    const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
-    if (statusDiff !== 0) return statusDiff;
-    
-    // Nakonec podle priority
-    return (a.priority || 999) - (b.priority || 999);
-  });
-
-  res.json(results);
-});
-
-// GET /api/stats - Statistiky portfolia
-app.get('/api/stats', (req, res) => {
-  const stats = {
-    totalGames: PORTFOLIO_GAMES.length,
-    liveGames: PORTFOLIO_GAMES.filter(g => g.status === 'Live').length,
-    inDev: PORTFOLIO_GAMES.filter(g => g.status === 'In Dev').length,
-    concepts: PORTFOLIO_GAMES.filter(g => g.status === 'Concept').length
-  };
-  res.json(stats);
-});
-
-// POST /api/contact - Kontaktní formulář
-app.post('/api/contact', async (req, res) => {
-  const { email, message } = req.body;
-
-  // Validace vstupů
-  if (!email || !message) {
-    return res.status(400).json({ 
-      success: false, 
-      error: 'Email and message are required fields.' 
-    });
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ 
-      success: false, 
-      error: 'Invalid email format provided.' 
-    });
-  }
-
-  if (message.trim().length < 10) {
-    return res.status(400).json({ 
-      success: false, 
-      error: 'Message must be at least 10 characters long.' 
-    });
-  }
-
-  try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
+  async sendContactEmail(fromEmail, message) {
+    if (!this.isConfigured) {
+      throw new Error('Email service not configured');
+    }
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: 'gaminutestudio@gmail.com',
-      replyTo: email,
-      subject: `🎮 Gaminute Portfolio: New Message from ${email}`,
-      text: `Name/Email: ${email}\n\nMessage:\n${message}`,
+      from: CONFIG.EMAIL_USER,
+      to: CONFIG.EMAIL_TO,
+      replyTo: fromEmail,
+      subject: `🎮 Gaminute Contact: ${fromEmail}`,
+      text: `From: ${fromEmail}\n\nMessage:\n${message}`,
       html: `
-        <h3>New Contact Form Submission</h3>
-        <p><strong>From:</strong> ${email}</p>
-        <p><strong>Message:</strong></p>
-        <blockquote style="background: #f0f0f0; padding: 10px; border-left: 4px solid #00d4ff;">
-          ${message.replace(/\n/g, '<br>')}
-        </blockquote>
+        <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #00d4ff; border-bottom: 2px solid #00d4ff; padding-bottom: 10px;">
+            New Contact Form Submission
+          </h2>
+          <div style="margin: 20px 0;">
+            <p style="margin: 5px 0;"><strong>From:</strong> ${fromEmail}</p>
+          </div>
+          <div style="background: #f5f5f5; padding: 20px; border-left: 4px solid #00d4ff; margin: 20px 0;">
+            <p style="margin: 0; white-space: pre-wrap;">${message}</p>
+          </div>
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+          <p style="color: #666; font-size: 12px;">
+            Sent from Gaminute Portfolio - ${new Date().toLocaleString()}
+          </p>
+        </div>
       `
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log(`✅ Email sent successfully from ${email}`);
+    return await this.transporter.sendMail(mailOptions);
+  }
+}
 
-    res.status(200).json({
-      success: true,
-      message: 'Email has been sent successfully.',
-      id: Date.now()
-    });
+// ========== MIDDLEWARE ==========
+const middleware = {
+  // Security headers
+  securityHeaders(req, res, next) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    next();
+  },
 
-  } catch (error) {
-    console.error('❌ Email send error:', error);
-    res.status(500).json({
+  // No cache for API routes
+  noCache(req, res, next) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  },
+
+  // Request logging
+  requestLogger(req, res, next) {
+    const timestamp = new Date().toISOString();
+    const method = req.method;
+    const path = req.path;
+    const ip = req.ip || req.connection.remoteAddress;
+    
+    console.log(`[${timestamp}] ${method} ${path} - ${ip}`);
+    next();
+  },
+
+  // Simple rate limiting (in-memory)
+  createRateLimiter() {
+    const requests = new Map();
+    
+    return (req, res, next) => {
+      const ip = req.ip || req.connection.remoteAddress;
+      const now = Date.now();
+      
+      if (!requests.has(ip)) {
+        requests.set(ip, []);
+      }
+      
+      const userRequests = requests.get(ip);
+      const recentRequests = userRequests.filter(
+        time => now - time < CONFIG.RATE_LIMIT.windowMs
+      );
+      
+      if (recentRequests.length >= CONFIG.RATE_LIMIT.maxRequests) {
+        return res.status(429).json({
+          success: false,
+          error: 'Too many requests. Please try again later.'
+        });
+      }
+      
+      recentRequests.push(now);
+      requests.set(ip, recentRequests);
+      
+      next();
+    };
+  },
+
+  // Validate contact form
+  validateContactForm(req, res, next) {
+    const { email, message } = req.body;
+    
+    if (!email || !message) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and message are required fields.'
+      });
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid email format.'
+      });
+    }
+    
+    if (message.trim().length < 10) {
+      return res.status(400).json({
+        success: false,
+        error: 'Message must be at least 10 characters long.'
+      });
+    }
+    
+    if (message.length > 5000) {
+      return res.status(400).json({
+        success: false,
+        error: 'Message is too long (max 5000 characters).'
+      });
+    }
+    
+    next();
+  },
+
+  // Error handler
+  errorHandler(err, req, res, next) {
+    console.error('❌ Error:', err);
+    
+    res.status(err.status || 500).json({
       success: false,
-      error: 'Failed to send email via SMTP provider.'
+      error: CONFIG.NODE_ENV === 'production' 
+        ? 'Internal server error'
+        : err.message
     });
   }
-});
+};
 
-// GET /api/health - Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    mode: 'static-no-db-email-enabled',
-    timestamp: new Date().toISOString(),
-    games: PORTFOLIO_GAMES.length,
-    version: '1.0.1' // Změňte toto číslo při každé změně dat
-  });
-});
-
-// Fallback pro SPA routing
-app.use((req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-  } else {
-    res.status(404).json({ error: 'Endpoint not found' });
+// ========== GAMES SERVICE ==========
+class GamesService {
+  static getAll(filters = {}) {
+    let games = [...PORTFOLIO_GAMES];
+    
+    // Apply filters
+    if (filters.genre && filters.genre !== 'all') {
+      games = games.filter(g => g.genre === filters.genre);
+    }
+    
+    if (filters.status && filters.status !== 'all') {
+      games = games.filter(g => g.status === filters.status);
+    }
+    
+    if (filters.search) {
+      const term = filters.search.toLowerCase();
+      games = games.filter(g =>
+        g.title.toLowerCase().includes(term) ||
+        g.description.toLowerCase().includes(term)
+      );
+    }
+    
+    // Sort games
+    return this.sortGames(games);
   }
-});
+  
+  static sortGames(games) {
+    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+    
+    return games.sort((a, b) => {
+      // Loading Rush always first
+      if (a.title === "Loading Rush") return -1;
+      if (b.title === "Loading Rush") return 1;
+      
+      // Sort by status
+      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+      if (statusDiff !== 0) return statusDiff;
+      
+      // Sort by priority
+      return (a.priority || 999) - (b.priority || 999);
+    });
+  }
+  
+  static getStats() {
+    return {
+      totalGames: PORTFOLIO_GAMES.length,
+      liveGames: PORTFOLIO_GAMES.filter(g => g.status === 'Live').length,
+      inDev: PORTFOLIO_GAMES.filter(g => g.status === 'In Dev').length,
+      concepts: PORTFOLIO_GAMES.filter(g => g.status === 'Concept').length
+    };
+  }
+}
 
-// Export pro Vercel
+// ========== APP INITIALIZATION ==========
+function createApp() {
+  const app = express();
+  const emailService = new EmailService();
+  
+  // Initialize email service
+  emailService.initialize();
+  
+  // Apply middleware
+  app.use(cors());
+  app.use(express.json({ limit: '10mb' }));
+  app.use(middleware.securityHeaders);
+  app.use(middleware.requestLogger);
+  
+  // Serve static files
+  app.use(express.static(path.join(__dirname, '../public'), {
+    maxAge: CONFIG.NODE_ENV === 'production' ? '1d' : 0
+  }));
+  
+  // ========== API ROUTES ==========
+  const apiRouter = express.Router();
+  
+  // Apply rate limiting to API routes
+  apiRouter.use(middleware.createRateLimiter());
+  apiRouter.use(middleware.noCache);
+  
+  // GET /api/health
+  apiRouter.get('/health', (req, res) => {
+    res.json({
+      status: 'ok',
+      environment: CONFIG.NODE_ENV,
+      timestamp: new Date().toISOString(),
+      email_configured: emailService.isConfigured,
+      games: PORTFOLIO_GAMES.length,
+      version: '2.0.0'
+    });
+  });
+  
+  // GET /api/stats
+  apiRouter.get('/stats', (req, res) => {
+    const stats = GamesService.getStats();
+    res.json(stats);
+  });
+  
+  // GET /api/games
+  apiRouter.get('/games', (req, res) => {
+    const { search, genre, status } = req.query;
+    const games = GamesService.getAll({ search, genre, status });
+    res.json(games);
+  });
+  
+  // POST /api/contact
+  apiRouter.post('/contact', 
+    middleware.validateContactForm,
+    async (req, res, next) => {
+      try {
+        const { email, message } = req.body;
+        
+        if (!emailService.isConfigured) {
+          return res.status(503).json({
+            success: false,
+            error: 'Email service is not configured.'
+          });
+        }
+        
+        await emailService.sendContactEmail(email, message);
+        
+        console.log(`✅ Email sent from ${email}`);
+        
+        res.status(200).json({
+          success: true,
+          message: 'Email sent successfully.',
+          id: Date.now()
+        });
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
+  
+  // Mount API router
+  app.use('/api', apiRouter);
+  
+  // SPA fallback - serve index.html for all non-API routes
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(__dirname, '../public/index.html'));
+  });
+  
+  // Error handler (must be last)
+  app.use(middleware.errorHandler);
+  
+  return app;
+}
+
+// ========== SERVER START ==========
+const app = createApp();
+
+function startServer() {
+  const server = app.listen(CONFIG.PORT, () => {
+    const stats = GamesService.getStats();
+    
+    console.log('\n' + '='.repeat(50));
+    console.log('🚀 Gaminute Server Started');
+    console.log('='.repeat(50));
+    console.log(`📍 URL: http://localhost:${CONFIG.PORT}`);
+    console.log(`🌍 Environment: ${CONFIG.NODE_ENV}`);
+    console.log(`📊 Total games: ${stats.totalGames}`);
+    console.log(`✅ Live games: ${stats.liveGames}`);
+    console.log(`🔧 In development: ${stats.inDev}`);
+    console.log(`💡 Concepts: ${stats.concepts}`);
+    
+    if (!CONFIG.EMAIL_USER || !CONFIG.EMAIL_PASS) {
+      console.log('⚠️  Email: Not configured');
+    } else {
+      console.log('✉️  Email: Configured');
+    }
+    
+    console.log('='.repeat(50) + '\n');
+  });
+  
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('⏹️  SIGTERM received, closing server...');
+    server.close(() => {
+      console.log('✅ Server closed');
+      process.exit(0);
+    });
+  });
+  
+  return server;
+}
+
+// Export for Vercel
 module.exports = app;
 
-// Local development server
+// Start server if run directly
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`\n🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📊 Total games: ${PORTFOLIO_GAMES.length}`);
-    console.log(`✅ Live games: ${PORTFOLIO_GAMES.filter(g => g.status === 'Live').length}`);
-    console.log(`🔧 In Dev: ${PORTFOLIO_GAMES.filter(g => g.status === 'In Dev').length}`);
-    console.log(`💡 Concepts: ${PORTFOLIO_GAMES.filter(g => g.status === 'Concept').length}`);
-    console.log(`\n💡 TIP: Změny vidíte v prohlížeči po Ctrl+Shift+R (hard refresh)\n`);
-    
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.warn("⚠️  WARNING: EMAIL_USER or EMAIL_PASS missing in .env file. Emails will fail.");
-    }
-  });
+  startServer();
 }

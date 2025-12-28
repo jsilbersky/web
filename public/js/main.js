@@ -1,6 +1,6 @@
 /* ========================================
-   GAMINUTE - COMPLETE JAVASCRIPT
-   Single-page portfolio logic
+   GAMINUTE - MODERN JAVASCRIPT
+   Optimized single-page portfolio
    ======================================== */
 
 // ========== GLOBAL STATE ==========
@@ -11,111 +11,216 @@ const STATE = {
     search: '',
     genre: 'all',
     status: 'all'
+  },
+  isLoading: false
+};
+
+// ========== CONFIGURATION ==========
+const CONFIG = {
+  API_BASE: '/api',
+  DEBOUNCE_DELAY: 300,
+  RETRY_ATTEMPTS: 3,
+  RETRY_DELAY: 1000,
+  TOAST_DURATION: 4000,
+  DEBUG: true
+};
+
+// ========== UTILITIES ==========
+const Utils = {
+  /**
+   * Debounce function calls
+   * @param {Function} fn - Function to debounce
+   * @param {number} delay - Delay in milliseconds
+   */
+  debounce(fn, delay) {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => fn(...args), delay);
+    };
+  },
+
+  /**
+   * Sleep for specified milliseconds
+   * @param {number} ms - Milliseconds to sleep
+   */
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
+  /**
+   * Log debug messages
+   * @param {string} message - Message to log
+   * @param {any} data - Optional data to log
+   */
+  log(message, data = null) {
+    if (CONFIG.DEBUG) {
+      const timestamp = new Date().toLocaleTimeString();
+      console.log(`[${timestamp}] 🎮 ${message}`, data || '');
+    }
+  },
+
+  /**
+   * Update year in footer
+   */
+  updateYear() {
+    const yearSpan = document.getElementById('year');
+    if (yearSpan) {
+      yearSpan.textContent = new Date().getFullYear();
+    }
   }
 };
 
 // ========== API CLIENT ==========
 const API = {
-  baseURL: '/api',
-  
-  async fetchStats() {
-    try {
-      const res = await fetch(`${this.baseURL}/stats?t=${Date.now()}`);
-      if (!res.ok) throw new Error('Stats fetch failed');
-      return await res.json();
-    } catch (err) {
-      console.error('API Error:', err);
-      return { totalGames: 5, liveGames: 1, inDev: 3 }; 
+  /**
+   * Fetch with retry logic
+   * @param {string} url - URL to fetch
+   * @param {RequestInit} options - Fetch options
+   * @param {number} retries - Number of retries
+   */
+  async fetchWithRetry(url, options = {}, retries = CONFIG.RETRY_ATTEMPTS) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            ...options.headers
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+      } catch (error) {
+        Utils.log(`Attempt ${i + 1}/${retries} failed for ${url}`, error.message);
+        
+        if (i === retries - 1) throw error;
+        await Utils.sleep(CONFIG.RETRY_DELAY * (i + 1));
+      }
     }
   },
 
+  /**
+   * Fetch portfolio statistics
+   */
+  async fetchStats() {
+    try {
+      const data = await this.fetchWithRetry(
+        `${CONFIG.API_BASE}/stats?t=${Date.now()}`
+      );
+      Utils.log('Stats loaded:', data);
+      return data;
+    } catch (error) {
+      Utils.log('Stats fetch failed, using fallback', error);
+      return { totalGames: 5, liveGames: 3, inDev: 1, concepts: 1 };
+    }
+  },
+
+  /**
+   * Fetch all games
+   */
   async fetchGames() {
     try {
-      const res = await fetch(`${this.baseURL}/games?t=${Date.now()}`);
-      if (!res.ok) throw new Error('Games fetch failed');
-      return await res.json();
-    } catch (err) {
-      console.error('API Error:', err);
+      const data = await this.fetchWithRetry(
+        `${CONFIG.API_BASE}/games?t=${Date.now()}`
+      );
+      Utils.log('Games loaded:', data.length);
+      return data;
+    } catch (error) {
+      Utils.log('Games fetch failed', error);
+      Toast.show('Failed to load games. Please refresh the page.', 'error');
       return [];
     }
   },
 
-  async submitContact(data) {
+  /**
+   * Submit contact form
+   * @param {Object} formData - Form data {email, message}
+   */
+  async submitContact(formData) {
     try {
-      const res = await fetch(`${this.baseURL}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error('Contact submission failed');
-      return await res.json();
-    } catch (err) {
-      console.error('API Error:', err);
-      throw err;
+      const data = await this.fetchWithRetry(
+        `${CONFIG.API_BASE}/contact`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        },
+        1 // Only 1 attempt for form submission
+      );
+      Utils.log('Contact form submitted:', data);
+      return data;
+    } catch (error) {
+      Utils.log('Contact submission failed', error);
+      throw error;
     }
   }
 };
 
 // ========== NAVIGATION ==========
 const Navigation = {
+  mobileMenuOpen: false,
+
   init() {
     this.setupSmoothScroll();
     this.setupActiveLink();
     this.setupMobileMenu();
+    this.setupKeyboardNav();
   },
 
   setupSmoothScroll() {
-    // Hlavní navigace + mobilní odkazy
-    const allLinks = document.querySelectorAll('a[href^="#"]');
-    
-    allLinks.forEach(link => {
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
-        
-        // Ignoruj prázdné kotvy
         if (!href || href === '#') return;
         
         e.preventDefault();
-        
-        const targetId = href.replace('#', '');
-        const targetSection = document.getElementById(targetId);
-        
-        if (targetSection) {
-          // Zavři mobilní menu pokud je otevřené
-          const panel = document.getElementById('mobile-panel');
-          if (panel && panel.classList.contains('open')) {
-            this.closeMobileMenu();
-          }
-          
-          // Počkej na zavření menu, pak scrolluj
-          setTimeout(() => {
-            targetSection.scrollIntoView({ 
-              behavior: 'smooth',
-              block: 'start'
-            });
-          }, 50);
-        }
+        this.scrollToSection(href.slice(1));
+      });
+    });
+  },
+
+  scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+
+    // Close mobile menu if open
+    if (this.mobileMenuOpen) {
+      this.closeMobileMenu();
+    }
+
+    // Smooth scroll after menu closes
+    requestAnimationFrame(() => {
+      section.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
       });
     });
   },
 
   setupActiveLink() {
     const sections = document.querySelectorAll('.section');
-    const navLinks = document.querySelectorAll('.nav-link');
+    const navLinks = document.querySelectorAll('.nav-link, .mobile-link');
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${id}`) {
-              link.classList.add('active');
-            }
-          });
-        }
-      });
-    }, { threshold: 0.3 });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            navLinks.forEach(link => {
+              const href = link.getAttribute('href');
+              link.classList.toggle('active', href === `#${id}`);
+            });
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: '-100px 0px -100px 0px' }
+    );
 
     sections.forEach(section => observer.observe(section));
   },
@@ -124,54 +229,33 @@ const Navigation = {
     const hamburger = document.getElementById('hamburger');
     const panel = document.getElementById('mobile-panel');
     const backdrop = document.getElementById('mobile-backdrop');
-    const mobileLinks = document.querySelectorAll('.mobile-link');
 
-    if (!hamburger || !panel) {
-      console.warn('Mobile menu elements not found');
-      return;
-    }
+    if (!hamburger || !panel) return;
 
-    // Hamburger toggle
     hamburger.addEventListener('click', (e) => {
       e.preventDefault();
-      e.stopPropagation();
-      
-      const isOpen = panel.classList.contains('open');
-      
-      if (isOpen) {
-        this.closeMobileMenu();
-      } else {
-        this.openMobileMenu();
-      }
+      this.toggleMobileMenu();
     });
 
-    // Backdrop zavře menu
-    if (backdrop) {
-      backdrop.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.closeMobileMenu();
-      });
-    }
+    backdrop?.addEventListener('click', () => this.closeMobileMenu());
 
-    // Každý mobilní link zavře menu
-    mobileLinks.forEach(link => {
+    document.querySelectorAll('.mobile-link').forEach(link => {
       link.addEventListener('click', () => {
-        // Zavřeme menu s malým zpožděním pro plynulost
-        setTimeout(() => {
-          this.closeMobileMenu();
-        }, 100);
+        // Menu will be closed by scrollToSection
       });
     });
+  },
 
-    // ESC zavře menu
+  setupKeyboardNav() {
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        const isOpen = panel.classList.contains('open');
-        if (isOpen) {
-          this.closeMobileMenu();
-        }
+      if (e.key === 'Escape' && this.mobileMenuOpen) {
+        this.closeMobileMenu();
       }
     });
+  },
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen ? this.closeMobileMenu() : this.openMobileMenu();
   },
 
   openMobileMenu() {
@@ -180,11 +264,11 @@ const Navigation = {
     
     if (!panel || !hamburger) return;
     
+    this.mobileMenuOpen = true;
     panel.classList.add('open');
     hamburger.classList.add('active');
     document.body.classList.add('nav-open');
-    
-    console.log('Menu opened');
+    Utils.log('Mobile menu opened');
   },
 
   closeMobileMenu() {
@@ -193,11 +277,11 @@ const Navigation = {
     
     if (!panel || !hamburger) return;
     
+    this.mobileMenuOpen = false;
     panel.classList.remove('open');
     hamburger.classList.remove('active');
     document.body.classList.remove('nav-open');
-    
-    console.log('Menu closed');
+    Utils.log('Mobile menu closed');
   }
 };
 
@@ -205,41 +289,55 @@ const Navigation = {
 const Stats = {
   async load() {
     const grid = document.getElementById('stats-grid');
-    const data = await API.fetchStats();
-    
-    grid.innerHTML = `
-      <div class="stat-card reveal">
-        <span class="stat-number">${data.totalGames}</span>
-        <span class="stat-label">Games in portfolio</span>
-      </div>
-      <div class="stat-card reveal">
-        <span class="stat-number">${data.liveGames}</span>
-        <span class="stat-label">Live on Play Store</span>
-      </div>
-      <div class="stat-card reveal">
-        <span class="stat-number">${data.inDev}</span>
-        <span class="stat-label">In Development</span>
-      </div>
-    `;
-    
-    setTimeout(() => {
-      grid.querySelectorAll('.stat-card').forEach(card => card.classList.add('show'));
-    }, 100);
+    if (!grid) return;
+
+    try {
+      const data = await API.fetchStats();
+      
+      grid.innerHTML = `
+        <div class="stat-card reveal">
+          <span class="stat-number">${data.totalGames}</span>
+          <span class="stat-label">Games in portfolio</span>
+        </div>
+        <div class="stat-card reveal">
+          <span class="stat-number">${data.liveGames}</span>
+          <span class="stat-label">Live on Play Store</span>
+        </div>
+        <div class="stat-card reveal">
+          <span class="stat-number">${data.inDev}</span>
+          <span class="stat-label">In Development</span>
+        </div>
+      `;
+      
+      requestAnimationFrame(() => {
+        grid.querySelectorAll('.stat-card').forEach(card => 
+          card.classList.add('show')
+        );
+      });
+    } catch (error) {
+      Utils.log('Failed to load stats', error);
+    }
   }
 };
 
 // ========== GAMES SECTION ==========
 const Games = {
-  debounceTimer: null,
+  searchDebounced: null,
 
   async init() {
+    this.searchDebounced = Utils.debounce(
+      (value) => this.handleSearchChange(value),
+      CONFIG.DEBOUNCE_DELAY
+    );
+
     await this.loadGames();
     this.setupControls();
   },
 
   async loadGames() {
-    const games = await API.fetchGames();
-    STATE.games = games;
+    STATE.isLoading = true;
+    STATE.games = await API.fetchGames();
+    STATE.isLoading = false;
     this.applyFilters();
   },
 
@@ -250,14 +348,10 @@ const Games = {
     const resetBtn = document.getElementById('reset-filters');
 
     searchInput?.addEventListener('input', (e) => {
-      clearTimeout(this.debounceTimer);
-      this.debounceTimer = setTimeout(() => {
-        STATE.currentFilters.search = e.target.value.toLowerCase();
-        this.applyFilters();
-      }, 300);
+      this.searchDebounced(e.target.value.toLowerCase());
     });
 
-    filterChips?.forEach(chip => {
+    filterChips.forEach(chip => {
       chip.addEventListener('click', () => {
         filterChips.forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
@@ -271,62 +365,85 @@ const Games = {
       this.applyFilters();
     });
 
-    resetBtn?.addEventListener('click', () => {
-      searchInput.value = '';
-      STATE.currentFilters = { search: '', genre: 'all', status: 'all' };
-      filterChips?.forEach(c => c.classList.remove('active'));
-      document.querySelector('.chip[data-genre="all"]')?.classList.add('active');
-      statusSelect.value = 'all';
-      this.applyFilters();
-    });
+    resetBtn?.addEventListener('click', () => this.resetFilters());
+  },
+
+  handleSearchChange(value) {
+    STATE.currentFilters.search = value;
+    this.applyFilters();
+  },
+
+  resetFilters() {
+    const searchInput = document.getElementById('search-input');
+    const statusSelect = document.getElementById('status-select');
+    const filterChips = document.querySelectorAll('.chip');
+
+    if (searchInput) searchInput.value = '';
+    if (statusSelect) statusSelect.value = 'all';
+    
+    STATE.currentFilters = { search: '', genre: 'all', status: 'all' };
+    
+    filterChips.forEach(c => c.classList.remove('active'));
+    document.querySelector('.chip[data-genre="all"]')?.classList.add('active');
+    
+    this.applyFilters();
   },
 
   applyFilters() {
     let filtered = [...STATE.games];
 
-    // Search filter
+    // Apply search filter
     if (STATE.currentFilters.search) {
+      const searchTerm = STATE.currentFilters.search;
       filtered = filtered.filter(game =>
-        game.title.toLowerCase().includes(STATE.currentFilters.search) ||
-        game.description.toLowerCase().includes(STATE.currentFilters.search)
+        game.title.toLowerCase().includes(searchTerm) ||
+        game.description.toLowerCase().includes(searchTerm)
       );
     }
 
-    // Genre filter
+    // Apply genre filter
     if (STATE.currentFilters.genre !== 'all') {
-      filtered = filtered.filter(game => game.genre === STATE.currentFilters.genre);
+      filtered = filtered.filter(game => 
+        game.genre === STATE.currentFilters.genre
+      );
     }
 
-    // Status filter
+    // Apply status filter
     if (STATE.currentFilters.status !== 'all') {
-      filtered = filtered.filter(game => game.status === STATE.currentFilters.status);
+      filtered = filtered.filter(game => 
+        game.status === STATE.currentFilters.status
+      );
     }
 
-    // Řazení - STEJNÉ jako na serveru
-    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
-    
-    filtered.sort((a, b) => {
-      // 1. Loading Rush vždy první
-      if (a.title === "Loading Rush") return -1;
-      if (b.title === "Loading Rush") return 1;
-
-      // 2. Řazení podle statusu
-      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
-      if (statusDiff !== 0) {
-        return statusDiff;
-      }
-      
-      // 3. Řazení podle priority
-      return (a.priority || 999) - (b.priority || 999);
-    });
+    // Sort games (same as server logic)
+    filtered = this.sortGames(filtered);
 
     STATE.filteredGames = filtered;
     this.render();
   },
 
+  sortGames(games) {
+    const statusOrder = { 'Live': 0, 'In Dev': 1, 'Concept': 2 };
+    
+    return games.sort((a, b) => {
+      // Loading Rush always first
+      if (a.title === "Loading Rush") return -1;
+      if (b.title === "Loading Rush") return 1;
+
+      // Sort by status
+      const statusDiff = (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+      if (statusDiff !== 0) return statusDiff;
+      
+      // Sort by priority
+      return (a.priority || 999) - (b.priority || 999);
+    });
+  },
+
   render() {
     const grid = document.getElementById('games-grid');
     const emptyState = document.getElementById('empty-state');
+
+    if (!grid || !emptyState) return;
 
     if (STATE.filteredGames.length === 0) {
       grid.style.display = 'none';
@@ -336,32 +453,33 @@ const Games = {
 
     emptyState.hidden = true;
     grid.style.display = 'flex';
-    
     grid.innerHTML = STATE.filteredGames.map(game => this.createCard(game)).join('');
   },
 
   createCard(game) {
-    const statusClass = {
+    const statusBadgeClass = {
       'Live': 'badge-live',
       'In Dev': 'badge-dev',
       'Concept': 'badge-concept'
     }[game.status] || 'badge-concept';
 
-    const hasUrl = game.url && game.url.trim() !== '';
+    const hasPlayStoreUrl = game.url && game.url.trim() !== '';
     
-    let actionBtn;
-    if (game.status === 'Live' && hasUrl) {
-        actionBtn = `<a href="${game.url}" target="_blank" rel="noopener" class="btn btn-primary">Get on Google Play</a>`;
-    } else {
-        actionBtn = `<button class="btn btn-static" disabled>${game.status === 'In Dev' ? 'In Development' : 'Concept Only'}</button>`;
-    }
+    const actionButton = hasPlayStoreUrl
+      ? `<a href="${game.url}" target="_blank" rel="noopener" class="btn btn-primary">Get on Google Play</a>`
+      : `<button class="btn btn-static" disabled>${game.status === 'In Dev' ? 'In Development' : 'Concept Only'}</button>`;
 
     return `
       <article class="game-card" data-game-id="${game.id}">
         <div class="game-thumb">
-          <img src="${game.thumb}" alt="${game.title}" loading="lazy" onerror="this.src='img/gaminute_logo.png'">
+          <img 
+            src="${game.thumb}" 
+            alt="${game.title}" 
+            loading="lazy" 
+            onerror="this.src='img/gaminute_logo.png'"
+          >
           <div class="game-badges">
-            <span class="badge ${statusClass}">${game.status}</span>
+            <span class="badge ${statusBadgeClass}">${game.status}</span>
             <span class="badge badge-genre">${game.genre}</span>
           </div>
         </div>
@@ -370,7 +488,7 @@ const Games = {
           <h3 class="game-title">${game.title}</h3>
           <p class="game-desc">${game.description}</p>
           <div class="game-actions">
-            ${actionBtn}
+            ${actionButton}
           </div>
         </div>
       </article>
@@ -383,6 +501,10 @@ const ContactForm = {
   form: null,
   submitBtn: null,
   isSubmitting: false,
+  validators: {
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    minMessageLength: 10
+  },
 
   init() {
     this.form = document.getElementById('contact-form');
@@ -391,33 +513,44 @@ const ContactForm = {
     if (!this.form) return;
 
     this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-    
+    this.setupValidation();
+  },
+
+  setupValidation() {
     const emailInput = document.getElementById('email');
     const messageInput = document.getElementById('message');
 
     emailInput?.addEventListener('blur', () => this.validateEmail());
     messageInput?.addEventListener('blur', () => this.validateMessage());
+    
+    // Clear errors on input
+    emailInput?.addEventListener('input', () => this.clearError('email'));
+    messageInput?.addEventListener('input', () => this.clearError('message'));
+  },
+
+  clearError(fieldName) {
+    const input = document.getElementById(fieldName);
+    const error = document.getElementById(`${fieldName}-error`);
+    
+    if (input) input.style.borderColor = '';
+    if (error) error.textContent = '';
   },
 
   validateEmail() {
     const input = document.getElementById('email');
     const error = document.getElementById('email-error');
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!input.value) {
-      error.textContent = 'Email is required';
-      input.style.borderColor = 'var(--error)';
+      this.showFieldError(input, error, 'Email is required');
       return false;
     }
 
-    if (!emailRegex.test(input.value)) {
-      error.textContent = 'Please enter a valid email';
-      input.style.borderColor = 'var(--error)';
+    if (!this.validators.email.test(input.value)) {
+      this.showFieldError(input, error, 'Please enter a valid email');
       return false;
     }
 
-    error.textContent = '';
-    input.style.borderColor = '';
+    this.clearFieldError(input, error);
     return true;
   },
 
@@ -425,15 +558,23 @@ const ContactForm = {
     const input = document.getElementById('message');
     const error = document.getElementById('message-error');
 
-    if (!input.value || input.value.trim().length < 10) {
-      error.textContent = 'Message must be at least 10 characters';
-      input.style.borderColor = 'var(--error)';
+    if (!input.value || input.value.trim().length < this.validators.minMessageLength) {
+      this.showFieldError(input, error, `Message must be at least ${this.validators.minMessageLength} characters`);
       return false;
     }
 
-    error.textContent = '';
-    input.style.borderColor = '';
+    this.clearFieldError(input, error);
     return true;
+  },
+
+  showFieldError(input, error, message) {
+    if (input) input.style.borderColor = 'var(--error)';
+    if (error) error.textContent = message;
+  },
+
+  clearFieldError(input, error) {
+    if (input) input.style.borderColor = '';
+    if (error) error.textContent = '';
   },
 
   async handleSubmit(e) {
@@ -459,7 +600,7 @@ const ContactForm = {
       await API.submitContact({ email, message });
       Toast.show('Message sent successfully!', 'success');
       this.form.reset();
-    } catch (err) {
+    } catch (error) {
       Toast.show('Failed to send message. Please try again.', 'error');
     } finally {
       this.isSubmitting = false;
@@ -474,7 +615,6 @@ const ContactForm = {
     if (!this.submitBtn) return;
 
     this.submitBtn.disabled = loading;
-    
     if (btnText) btnText.hidden = loading;
     if (btnLoader) btnLoader.hidden = !loading;
   }
@@ -483,6 +623,7 @@ const ContactForm = {
 // ========== TOAST NOTIFICATIONS ==========
 const Toast = {
   container: null,
+  activeToasts: new Set(),
 
   init() {
     this.container = document.getElementById('toast-container');
@@ -491,10 +632,20 @@ const Toast = {
   show(message, type = 'success') {
     if (!this.container) return;
 
+    const toast = this.createToast(message, type);
+    this.container.appendChild(toast);
+    this.activeToasts.add(toast);
+
+    requestAnimationFrame(() => toast.classList.add('show'));
+
+    setTimeout(() => this.remove(toast), CONFIG.TOAST_DURATION);
+  },
+
+  createToast(message, type) {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     
-    const icon = type === 'success' 
+    const icon = type === 'success'
       ? '<svg class="toast-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>'
       : '<svg class="toast-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
 
@@ -506,70 +657,88 @@ const Toast = {
       </div>
     `;
 
-    this.container.appendChild(toast);
+    return toast;
+  },
 
+  remove(toast) {
+    toast.classList.add('removing');
     setTimeout(() => {
-      toast.classList.add('removing');
-      setTimeout(() => toast.remove(), 300);
-    }, 4000);
+      toast.remove();
+      this.activeToasts.delete(toast);
+    }, 300);
   }
 };
 
 // ========== REVEAL ON SCROLL ==========
 const RevealOnScroll = {
+  observer: null,
+
   init() {
     const elements = document.querySelectorAll('.reveal');
     
-    if (typeof IntersectionObserver === 'undefined') {
+    if (!('IntersectionObserver' in window)) {
       elements.forEach(el => el.classList.add('show'));
       return;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('show');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            this.observer.unobserve(entry.target);
+          }
+        });
+      },
+      { 
+        threshold: 0.1, 
+        rootMargin: '0px 0px -50px 0px' 
+      }
+    );
 
-    elements.forEach(el => observer.observe(el));
-  }
-};
-
-// ========== UTILITIES ==========
-const Utils = {
-  updateYear() {
-    const yearSpan = document.getElementById('year');
-    if (yearSpan) {
-      yearSpan.textContent = new Date().getFullYear();
-    }
+    elements.forEach(el => this.observer.observe(el));
   }
 };
 
 // ========== INITIALIZATION ==========
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🎮 Gaminute Portfolio Loaded');
+async function initApp() {
+  Utils.log('🎮 Gaminute Portfolio Loading...');
   
+  // Initialize synchronous modules
   Utils.updateYear();
   Navigation.init();
   ContactForm.init();
   Toast.init();
   RevealOnScroll.init();
 
-  await Promise.all([
-    Stats.load(),
-    Games.init()
-  ]);
+  // Load async data
+  try {
+    await Promise.all([
+      Stats.load(),
+      Games.init()
+    ]);
+    
+    Utils.log('✅ All data loaded successfully');
+  } catch (error) {
+    Utils.log('❌ Initialization error:', error);
+  }
 
-  setTimeout(() => {
+  // Trigger hero animations
+  requestAnimationFrame(() => {
     document.querySelectorAll('.hero-content .reveal').forEach(el => {
       el.classList.add('show');
     });
-  }, 100);
-});
+  });
+}
 
+// Start app when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// Export for testing (Node.js environments)
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { API, STATE, Games, ContactForm, Toast };
+  module.exports = { API, STATE, Games, ContactForm, Toast, Utils, CONFIG };
 }
