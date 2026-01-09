@@ -641,7 +641,6 @@ const ContactForm = {
     const messageValid = this.validateMessage();
 
     if (!emailValid || !messageValid) {
-      Toast.show('Please fix the errors', 'error');
       return;
     }
 
