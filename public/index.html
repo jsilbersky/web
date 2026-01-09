@@ -242,18 +242,20 @@
               <span class="form-error" id="email-error"></span>
             </div>
 
-            <div class="form-group">
-              <label for="message">Message</label>
-              <textarea 
-                id="message" 
-                name="message"
-                class="form-input"
-                rows="5"
-                placeholder="What's on your mind?"
-                required
-              ></textarea>
-              <span class="form-error" id="message-error"></span>
-            </div>
+<div class="form-group">
+  <label for="message">Message</label>
+  <textarea 
+    id="message" 
+    name="message"
+    class="form-input"
+    rows="5"
+    placeholder="What's on your mind?"
+    required
+    maxlength="2000"
+  ></textarea>
+  <div class="char-counter" id="char-counter">0/2000</div>
+  <span class="form-error" id="message-error"></span>
+</div>
 
             <button type="submit" class="btn btn-primary btn-submit" id="submit-btn">
               <span class="btn-text">Send Message</span>

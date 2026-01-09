@@ -70,7 +70,7 @@ const PORTFOLIO_GAMES = [
     version: "0.8.0",
     status: "Live",
     priority: 4,
-    url: "",
+    url: "https://play.google.com/store/apps/details?id=com.jsilbersky.shape",
     thumb: "img/shapeslash.webp"
   },
   {
@@ -238,10 +238,10 @@ const middleware = {
       });
     }
     
-    if (message.length > 5000) {
+    if (message.length > 2000) {
       return res.status(400).json({
         success: false,
-        error: 'Message is too long (max 5000 characters).'
+        error: 'Message cannot exceed 2000 characters.'
       });
     }
     

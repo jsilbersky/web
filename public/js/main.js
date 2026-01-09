@@ -510,7 +510,8 @@ const ContactForm = {
   isSubmitting: false,
   validators: {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    minMessageLength: 10
+    minMessageLength: 10,
+    maxMessageLength: 2000
   },
 
   init() {
@@ -521,6 +522,27 @@ const ContactForm = {
 
     this.form.addEventListener('submit', (e) => this.handleSubmit(e));
     this.setupValidation();
+    this.setupCharCounter();
+  },
+
+  setupCharCounter() {
+    const messageInput = document.getElementById('message');
+    const charCounter = document.getElementById('char-counter');
+
+    if (!messageInput || !charCounter) return;
+
+    messageInput.addEventListener('input', () => {
+      const currentLength = messageInput.value.length;
+      const maxLength = this.validators.maxMessageLength;
+      
+      charCounter.textContent = `${currentLength}/${maxLength}`;
+      
+      if (currentLength >= maxLength) {
+        charCounter.classList.add('limit-reached');
+      } else {
+        charCounter.classList.remove('limit-reached');
+      }
+    });
   },
 
   setupValidation() {
@@ -565,8 +587,20 @@ const ContactForm = {
     const input = document.getElementById('message');
     const error = document.getElementById('message-error');
 
-    if (!input.value || input.value.trim().length < this.validators.minMessageLength) {
+    const messageLength = input.value.trim().length;
+
+    if (messageLength === 0) {
+      this.showFieldError(input, error, 'Message is required');
+      return false;
+    }
+
+    if (messageLength < this.validators.minMessageLength) {
       this.showFieldError(input, error, `Message must be at least ${this.validators.minMessageLength} characters`);
+      return false;
+    }
+
+    if (messageLength > this.validators.maxMessageLength) {
+      this.showFieldError(input, error, `Message cannot exceed ${this.validators.maxMessageLength} characters`);
       return false;
     }
 
@@ -607,6 +641,13 @@ const ContactForm = {
       await API.submitContact({ email, message });
       Toast.show('Message sent successfully!', 'success');
       this.form.reset();
+      
+      // Reset character counter
+      const charCounter = document.getElementById('char-counter');
+      if (charCounter) {
+        charCounter.textContent = '0/2000';
+        charCounter.classList.remove('limit-reached');
+      }
     } catch (error) {
       Toast.show('Failed to send message. Please try again.', 'error');
     } finally {

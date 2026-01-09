@@ -1072,6 +1072,19 @@ a {
   font-weight: 600;
 }
 
+.char-counter {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--dim);
+  font-weight: 600;
+  text-align: right;
+}
+
+.char-counter.limit-reached {
+  color: var(--error);
+}
+
 .btn-submit {
   width: 100%;
   position: relative;
