@@ -569,6 +569,29 @@ a {
   position: relative;
 }
 
+
+.search-input {
+
+  padding: 0 50px 0 48px; 
+}
+
+
+.search-counter {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--tertiary); 
+  pointer-events: none;   
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.search-counter.limit-reached {
+  color: var(--error);
+}
+
 .search-icon {
   position: absolute;
   left: 16px;

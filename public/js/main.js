@@ -345,16 +345,26 @@ const Games = {
     this.applyFilters();
   },
 
-  setupControls() {
+setupControls() {
     const searchInput = document.getElementById('search-input');
+    const searchCounter = document.getElementById('search-counter'); // Nové
     const filterChips = document.querySelectorAll('.chip');
     const statusSelect = document.getElementById('status-select');
     const resetBtn = document.getElementById('reset-filters');
 
+    // 1. Search Listener s počítadlem
     searchInput?.addEventListener('input', (e) => {
+      // Aktualizace počítadla
+      const currentLength = e.target.value.length;
+      if (searchCounter) {
+        searchCounter.textContent = `${currentLength}/50`;
+      }
+      
+      // Spuštění hledání
       this.searchDebounced(e.target.value.toLowerCase());
     });
 
+    // 2. Filter Chips
     filterChips.forEach(chip => {
       chip.addEventListener('click', () => {
         filterChips.forEach(c => c.classList.remove('active'));
@@ -364,11 +374,13 @@ const Games = {
       });
     });
 
+    // 3. Status Select
     statusSelect?.addEventListener('change', (e) => {
       STATE.currentFilters.status = e.target.value;
       this.applyFilters();
     });
 
+    // 4. Reset Button
     resetBtn?.addEventListener('click', () => this.resetFilters());
   },
 
@@ -377,12 +389,14 @@ const Games = {
     this.applyFilters();
   },
 
-  resetFilters() {
+resetFilters() {
     const searchInput = document.getElementById('search-input');
+    const searchCounter = document.getElementById('search-counter'); // New
     const statusSelect = document.getElementById('status-select');
     const filterChips = document.querySelectorAll('.chip');
 
     if (searchInput) searchInput.value = '';
+    if (searchCounter) searchCounter.textContent = '0/50'; // Reset text
     if (statusSelect) statusSelect.value = 'all';
     
     STATE.currentFilters = { search: '', genre: 'all', status: 'all' };

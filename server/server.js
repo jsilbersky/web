@@ -263,7 +263,7 @@ const middleware = {
 
 // ========== GAMES SERVICE ==========
 class GamesService {
-  static getAll(filters = {}) {
+static getAll(filters = {}) {
     let games = [...PORTFOLIO_GAMES];
     
     // Apply filters
@@ -276,7 +276,9 @@ class GamesService {
     }
     
     if (filters.search) {
-      const term = filters.search.toLowerCase();
+      // SECURITY: Limit search term to 50 chars max
+      const term = filters.search.substring(0, 50).toLowerCase(); 
+      
       games = games.filter(g =>
         g.title.toLowerCase().includes(term) ||
         g.description.toLowerCase().includes(term)
