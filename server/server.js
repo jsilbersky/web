@@ -39,7 +39,7 @@ const PORTFOLIO_GAMES = [
   },
   {
     id: 2,
-    title: "TicTacToe Lava",
+    title: "Tic Tac Toe Lava",
     description: "Classic logic game with a chaotic twist. The board melts beneath you as tiles fall due to gravity, and you must survive the rising lava. Includes Daily Challenges, power-ups, and progressive difficulty modes.",
     genre: "puzzle",
     tech: "dom",
