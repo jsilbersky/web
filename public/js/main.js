@@ -185,23 +185,31 @@ const Navigation = {
     });
   },
 
-  scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) return;
+scrollToSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
 
-    // Close mobile menu if open
-    if (this.mobileMenuOpen) {
-      this.closeMobileMenu();
-    }
+  // 1. Zavři mobilní menu, pokud je otevřené
+  if (this.mobileMenuOpen) {
+    this.closeMobileMenu();
+  }
 
-    // Smooth scroll after menu closes
-    requestAnimationFrame(() => {
-      section.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+  // 2. AKTUALIZACE URL (Přidání hashe)
+  // Toto zajistí, že Playwright uvidí v URL např. #about
+  if (history.pushState) {
+    history.pushState(null, null, `#${sectionId}`);
+  } else {
+    location.hash = `#${sectionId}`;
+  }
+
+  // 3. Plynulý scroll
+  requestAnimationFrame(() => {
+    section.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
     });
-  },
+  });
+},
 
 setupActiveLink() {
     const sections = document.querySelectorAll('.section');
