@@ -106,18 +106,43 @@ const API = {
   },
 
   /**
+   * Calculate portfolio statistics from games
+   */
+  calculateStats(games) {
+    return {
+      totalGames: games.length,
+      liveGames: games.filter(g => g.status === 'Live').length,
+      inDev: games.filter(g => g.status === 'In Dev').length,
+      concepts: games.filter(g => g.status === 'Concept').length
+    };
+  },
+
+  /**
    * Fetch portfolio statistics
    */
   async fetchStats() {
     try {
+      // If games are already loaded, calculate from them
+      if (STATE.games.length > 0) {
+        const stats = this.calculateStats(STATE.games);
+        Utils.log('Stats calculated from games:', stats);
+        return stats;
+      }
+
+      // Otherwise fetch from API
       const data = await this.fetchWithRetry(
         `${CONFIG.API_BASE}/stats?t=${Date.now()}`
       );
       Utils.log('Stats loaded:', data);
       return data;
     } catch (error) {
-      Utils.log('Stats fetch failed, using fallback', error);
-      return { totalGames: 5, liveGames: 3, inDev: 1, concepts: 1 };
+      Utils.log('Stats fetch failed, calculating from games', error);
+      // Fallback: calculate from loaded games
+      if (STATE.games.length > 0) {
+        return this.calculateStats(STATE.games);
+      }
+      // If no games loaded yet, return empty stats
+      return { totalGames: 0, liveGames: 0, inDev: 0, concepts: 0 };
     }
   },
 
@@ -780,13 +805,11 @@ async function initApp() {
   Toast.init();
   RevealOnScroll.init();
 
-  // Load async data
+  // Load async data (games first, then stats so stats can be calculated from games)
   try {
-    await Promise.all([
-      Stats.load(),
-      Games.init()
-    ]);
-    
+    await Games.init();
+    await Stats.load();
+
     Utils.log('✅ All data loaded successfully');
   } catch (error) {
     Utils.log('❌ Initialization error:', error);
